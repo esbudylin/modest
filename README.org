@@ -86,10 +86,12 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local chord = Chord.fromstring("C#maj7")
       print(chord:tostring())
-      print(chord:tostring(true)
+      print(chord:tostring(true))
     #+end_src
 
     #+RESULTS:
+    : C♯M7
+    : C#M7
 
 - toascii(self) -> string
   - Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
