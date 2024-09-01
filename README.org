@@ -17,7 +17,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - fromstring(string) -> Chord
   - Parses a string and returns a Chord object.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local chord = Chord.fromstring("Cmaj7")
     print(chord)
     #+end_src
@@ -28,7 +28,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - transpose(self, interval) -> Chord
   - Returns a new Chord transposed by the given interval.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local transposed = Chord.fromstring("C6/9"):transpose("m3")
     print(transposed)
     #+end_src
@@ -39,7 +39,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - transpose_down(self, interval) -> Chord
   - Similar to transpose, returns a chord transposed down by the given interval.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local transposed_down = Chord.fromstring("Ab9"):transpose_down("P5")
       print(transposed_down)
     #+end_src
@@ -50,7 +50,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - notes(self, octave=nil) -> [Note]
   - Returns the notes that make up the chord. Optionally, specify the octave of the root note.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local notes = Chord.fromstring("F#"):notes(4)
     for _, note in ipairs(notes) do print(note) end
     #+end_src
@@ -63,7 +63,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - numeric(self) -> [int]
   - Converts the chord into a numeric representation, with each note represented as the number of semitones from the C of the chord's root octave.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local numeric = Chord.fromstring("C/Bb"):numeric()
     print(table.concat(numeric, ", "))
     #+end_src
@@ -71,7 +71,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : -2, 0, 4, 7
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local chord = Chord.fromstring("G9")
     local numeric = chord:numeric()
     print(table.concat(numeric, ", "))
@@ -83,7 +83,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - tostring(self, ascii=nil) -> string
   - Converts the chord into a string. By default accidental will be represented with special Unicode characters ('♯' for sharp, '♭' for flat, '𝄪' for double sharp, '𝄫' for double flat). Pass a true value as a parameter to get an ASCII representation ('#' for sharp, 'b' for flat, 'x' for double sharp, 'bb' for double flat).
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local chord = Chord.fromstring("C#maj7")
       print(chord:tostring())
       print(chord:tostring(true)
@@ -94,7 +94,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - toascii(self) -> string
   - Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local chord = Chord.fromstring("G7#11")
       print(chord:toascii())
     #+end_src
@@ -113,7 +113,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     - "d7" = diminished seventh
     - "M6" = major sixth.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local interval = Interval.fromstring("P4")
     print(interval)
     #+end_src
@@ -124,7 +124,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - new(size, quality="perefect") -> Note
   - Creates a new Interval object. Size should be an integer, and quality should be a string (valid options are "dim", "aug", "min", "maj", "perfect"). The method raises an error if the interval is invalid.
   - Examples:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local interval = Interval.new(3, "aug")
       print(interval)
     #+end_src
@@ -132,7 +132,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : A3
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local interval = Interval.new(13, "maj")
       print(interval)
     #+end_src
@@ -140,7 +140,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : M13
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local interval = Interval.new(5)
       print(interval)
     #+end_src
@@ -148,7 +148,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : P5
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local _, err = pcall(function() Interval.new(5, "min") end)
       print(err)
     #+end_src
@@ -159,7 +159,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local interval = Interval.identify("C", "F")
     print(interval)
     #+end_src
@@ -170,7 +170,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - semitones(self) -> int
   - Returns the number of semitones in the interval.
   - Examples:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local semitones = Interval.fromstring("M3"):semitones()
     print(semitones)
     #+end_src
@@ -181,7 +181,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - tostring(self) -> string
   - Converts the interval into a string representation.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local interval = Interval.new(6, "min")
     print(interval)
     #+end_src
@@ -195,7 +195,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - fromstring(string) -> Note
   - Parses a string and returns a Note object.
   - Examples:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local note = Note.fromstring("C#4")
       print(note)
     #+end_src
@@ -203,7 +203,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : C♯4
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local note = Note.fromstring("E") -- the octave is optional
       print(note)
     #+end_src
@@ -214,7 +214,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - new(tone, accidental=0, octave=nil) -> Note
   - Creates a new Note object. The tone should be a capital letter (e.g., "C"). The accidental should be a numeric value (e.g., -1 for flat, 1 for sharp). The octave is optional.
   - Examples:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local note = Note.new("D", 1, 5)
     print(note)
     #+end_src
@@ -222,7 +222,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : D♯5
 
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local note = Note.new("B", -2)
     print(note)
     #+end_src
@@ -233,7 +233,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - transpose(self, interval) -> Note
   - Returns a new note transposed by the given interval.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local transposed = Note.fromstring("C4"):transpose("P4")
     print(transposed)
     #+end_src
@@ -244,7 +244,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - transpose_down(self, interval) -> Note
   - Returns a new note transposed down by the given interval.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local transposed_down = Note.fromstring("C4"):transpose_down("m3")
     print(transposed_down)
     #+end_src
@@ -255,7 +255,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - pitch_class(self) -> int
   - Returns a number from 0 to 11 representing the pitch class of the note (e.g., C=0, C♯/D♭=1, ..., B=11).
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local note = Note.fromstring("G")
     print(note:pitch_class())
     #+end_src
@@ -267,7 +267,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - toascii(self) -> string
   - Works similarly to the Chord methods of the same name.
   - Example:
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local note = Note.fromstring("D#4")
       print(note:tostring())
       print(note:tostring(true))
