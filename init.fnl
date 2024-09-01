@@ -31,7 +31,7 @@
   (parse grammars.interval str))
 
 (defadvice
- [Note.transpose Note.transpose_down]
+ [Note.transpose Note.transpose_down Chord.transpose Chord.transpose_down]
  (fn [foo self & args]
    (apply (partial foo self) 
           (parse-if-strings grammars.interval args))))

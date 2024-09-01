@@ -167,6 +167,6 @@
 (fn Interval.tostring [{: size &as self}]
   (.. (notate-quality self) size))
 
-{: Interval : Note : is-perfect : accidental-to-semitones : semitone-interval : accidental-to-string : assoc-octave
+{: Interval : Note : is-perfect : accidental-to-semitones : semitone-interval : accidental-to-string : assoc-octave : transpose-util
  :base_interval base-interval
  :accidental_to_semitones accidental-to-semitones}

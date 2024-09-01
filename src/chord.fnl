@@ -1,6 +1,6 @@
 (local b (require :src.basics))
-(local (Note Interval is-perfect semitone-interval accidental-to-string assoc-octave)
-       (values b.Note b.Interval b.is-perfect b.semitone-interval b.accidental-to-string b.assoc-octave))
+(local (Note Interval is-perfect semitone-interval accidental-to-string assoc-octave transpose-util)
+       (values b.Note b.Interval b.is-perfect b.semitone-interval b.accidental-to-string b.assoc-octave b.transpose-util))
 
 (local u (require :utils))
 (local
@@ -99,6 +99,14 @@
 
 (local Chord {})
 
+(fn chord-transpose-util [{: intervals : suffix : bass : root} interval dir]
+  (let [chord {: intervals
+               : suffix
+               :bass (when bass (transpose-util bass interval dir))
+               :root (transpose-util root interval dir)}]
+    (setmetatable chord {:__index Chord :__tostring Chord.tostring})
+    chord))
+
 (fn Chord.numeric [{: root : intervals &as t}]
   (safe-cons (num-bass t)
              (transpose (map Interval.semitones intervals) root)))
@@ -107,12 +115,11 @@
   (safe-cons (bass-with-octave t octave)
              (map (partial Note.transpose (assoc-octave root octave)) intervals)))
 
-(fn Chord.transpose [{: intervals : bass : root} interval]
-  (let [chord {: intervals
-               :bass (when bass (Note.transpose bass interval))
-               :root (Note.transpose root interval)}]
-    (setmetatable chord (Chord.mt))
-    chord))
+(fn Chord.transpose [self interval]
+  (chord-transpose-util self interval 1))
+
+(fn Chord.transpose_down [self interval]
+  (chord-transpose-util self interval -1))
 
 (fn Chord.tostring [{: root : bass : suffix} ascii]
   (local str-func #(Note.tostring $1 ascii))

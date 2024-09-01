@@ -169,3 +169,39 @@ function test_chord_tostring()
       )
    end
 end
+
+function test_chord_transposition()
+   local chords = {
+      { "C/Bb", "E/D", "M3" },
+      { "C7",   "G7",  "P12" },
+      { "E7",   "G7",  "m3" },
+      { "E7",   "Eb7", "d8" },
+   }
+
+   for _, test in ipairs(chords) do
+      local chord, transposed_chord, interval = table.unpack(test)
+      local parsed_interval = lib.Interval.fromstring(interval)
+
+      local get_transpose_result = function(i)
+         return lib.Chord.fromstring(chord):transpose(i):toascii()
+      end
+
+      local get_transpose_down_result = function(i)
+         return lib.Chord.fromstring(transposed_chord):transpose_down(i):toascii()
+      end
+
+      luaunit.assertEquals(
+         get_transpose_result(parsed_interval),
+         get_transpose_result(interval),
+         transposed_chord,
+         "Mismatched transposition result for chord: " .. chord
+      )
+
+      luaunit.assertEquals(
+         get_transpose_down_result(parsed_interval),
+         get_transpose_down_result(interval),
+         chord,
+         "Mismatched transpose_down result for chord: " .. chord
+      )
+   end
+end
