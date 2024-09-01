@@ -3,6 +3,13 @@
 * Modest
 Musical harmony library for Lua.
 
+* Installation
+The easiest way to install Modest is via LuaRocks.
+
+#+begin_src
+luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspec/modest-0.1-1.rockspec
+#+end_src
+
 * Documentation
 ** Chord
 *** Methods
@@ -15,47 +22,63 @@ Musical harmony library for Lua.
     print(chord)
     #+end_src
 
+    #+RESULTS:
+    : CM7
+
 - transpose(self, interval) -> Chord
   - Returns a new Chord transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local chord = Chord.fromstring("C6/9")
-    local transposed = chord:transpose(Interval.new(5))
+    local transposed = Chord.fromstring("C6/9"):transpose("m3")
     print(transposed)
     #+end_src
+
+    #+RESULTS:
+    : E♭6/9
 
 - transpose_down(self, interval) -> Chord
   - Similar to transpose, returns a chord transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local chord = Chord.fromstring("Ab9")
-    local transposed_down = chord:transpose_down(Interval.new(5))
-    print(transposed_down)
+      local transposed_down = Chord.fromstring("Ab9"):transpose_down("P5")
+      print(transposed_down)
     #+end_src
+
+    #+RESULTS:
+    : D♭9
 
 - notes(self, octave=nil) -> [Note]
   - Returns the notes that make up the chord. Optionally, specify the octave of the root note.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local chord = Chord.fromstring("F#")
-    local notes = chord:notes(4)
+    local notes = Chord.fromstring("F#"):notes(4)
     for _, note in ipairs(notes) do print(note) end
     #+end_src
+
+    #+RESULTS:
+    : F♯4
+    : A♯4
+    : C♯5
 
 - numeric(self) -> [int]
   - Converts the chord into a numeric representation, with each note represented as the number of semitones from the C of the chord's root octave.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local chord = Chord.fromstring("C/Bb")
-    local numeric = chord:numeric()
+    local numeric = Chord.fromstring("C/Bb"):numeric()
     print(table.concat(numeric, ", "))
     #+end_src
+
+    #+RESULTS:
+    : -2, 0, 4, 7
 
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
     local chord = Chord.fromstring("G9")
     local numeric = chord:numeric()
     print(table.concat(numeric, ", "))
     #+end_src
+
+    #+RESULTS:
+    : 7, 11, 14, 17, 21
 
 - tostring(self, ascii=nil) -> string
   - Converts the chord into a string. By default accidental will be represented with special Unicode characters ('♯' for sharp, '♭' for flat, '𝄪' for double sharp, '𝄫' for double flat). Pass a true value as a parameter to get an ASCII representation ('#' for sharp, 'b' for flat, 'x' for double sharp, 'bb' for double flat).
@@ -66,13 +89,18 @@ Musical harmony library for Lua.
       print(chord:tostring(true)
     #+end_src
 
+    #+RESULTS:
+
 - toascii(self) -> string
   - Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-      local chord = Chord.fromstring("C#maj7")
+      local chord = Chord.fromstring("G7#11")
       print(chord:toascii())
     #+end_src
+
+    #+RESULTS:
+    : G7#11
 
 ** Interval
 *** Methods
@@ -90,6 +118,9 @@ Musical harmony library for Lua.
     print(interval)
     #+end_src
 
+    #+RESULTS:
+    : P4
+
 - new(size, quality="perefect") -> Note
   - Creates a new Interval object. Size should be an integer, and quality should be a string (valid options are "dim", "aug", "min", "maj", "perfect"). The method raises an error if the interval is invalid.
   - Examples:
@@ -98,38 +129,54 @@ Musical harmony library for Lua.
       print(interval)
     #+end_src
 
+    #+RESULTS:
+    : A3
+
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-      local interval = Interval.new(11, "maj")
+      local interval = Interval.new(13, "maj")
       print(interval)
     #+end_src
+
+    #+RESULTS:
+    : M13
 
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
       local interval = Interval.new(5)
       print(interval)
     #+end_src
 
+    #+RESULTS:
+    : P5
+
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
       local _, err = pcall(function() Interval.new(5, "min") end)
       print(err)
     #+end_src
 
+    #+RESULTS:
+    : ./src/basics.lua:130: Invalid combination of size and quality
+
 - identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local C = Note.fromstring("C")
-    local F = Note.fromstring("F")
-    local interval = Interval.identify(C, F)
+    local interval = Interval.identify("C", "F")
     print(interval)
     #+end_src
+
+    #+RESULTS:
+    : P4
 
 - semitones(self) -> int
   - Returns the number of semitones in the interval.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local interval = Interval.fromstring("M3")
-    print(interval:semitones())
+    local semitones = Interval.fromstring("M3"):semitones()
+    print(semitones)
     #+end_src
+
+    #+RESULTS:
+    : 4
 
 - tostring(self) -> string
   - Converts the interval into a string representation.
@@ -139,16 +186,30 @@ Musical harmony library for Lua.
     print(interval)
     #+end_src
 
+    #+RESULTS:
+    : m6
+
 ** Note
 *** Methods
 
 - fromstring(string) -> Note
   - Parses a string and returns a Note object.
-  - Example:
+  - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local note = Note.fromstring("C#4")
-    print(note)
+      local note = Note.fromstring("C#4")
+      print(note)
     #+end_src
+
+    #+RESULTS:
+    : C♯4
+
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
+      local note = Note.fromstring("E") -- the octave is optional
+      print(note)
+    #+end_src
+
+    #+RESULTS:
+    : E
 
 - new(tone, accidental=0, octave=nil) -> Note
   - Creates a new Note object. The tone should be a capital letter (e.g., "C"). The accidental should be a numeric value (e.g., -1 for flat, 1 for sharp). The octave is optional.
@@ -158,28 +219,38 @@ Musical harmony library for Lua.
     print(note)
     #+end_src
 
+    #+RESULTS:
+    : D♯5
+
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
     local note = Note.new("B", -2)
     print(note)
     #+end_src
 
+    #+RESULTS:
+    : B𝄫
+
 - transpose(self, interval) -> Note
   - Returns a new note transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local note = Note.fromstring("C4")
-    local transposed = note:transpose(Interval.new(4))
+    local transposed = Note.fromstring("C4"):transpose("P4")
     print(transposed)
     #+end_src
+
+    #+RESULTS:
+    : F4
 
 - transpose_down(self, interval) -> Note
   - Returns a new note transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output
-    local note = Note.fromstring("C4")
-    local transposed_down = note:transpose_down(Interval.new(3, "min"))
+    local transposed_down = Note.fromstring("C4"):transpose_down("m3")
     print(transposed_down)
     #+end_src
+
+    #+RESULTS:
+    : A3
 
 - pitch_class(self) -> int
   - Returns a number from 0 to 11 representing the pitch class of the note (e.g., C=0, C♯/D♭=1, ..., B=11).
@@ -188,6 +259,9 @@ Musical harmony library for Lua.
     local note = Note.fromstring("G")
     print(note:pitch_class())
     #+end_src
+
+    #+RESULTS:
+    : 7
 
 - tostring(self, ascii) -> string
 - toascii(self) -> string
@@ -199,4 +273,9 @@ Musical harmony library for Lua.
       print(note:tostring(true))
       print(note:toascii())
     #+end_src
+
+    #+RESULTS:
+    : D♯4
+    : D#4
+    : D#4
 
