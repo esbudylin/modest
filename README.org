@@ -72,8 +72,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     : -2, 0, 4, 7
 
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local chord = Chord.fromstring("G9")
-    local numeric = chord:numeric()
+    local numeric = Chord.fromstring("G9"):numeric()
     print(table.concat(numeric, ", "))
     #+end_src
 
