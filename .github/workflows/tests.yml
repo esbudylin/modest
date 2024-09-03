@@ -1,0 +1,54 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-lua-puc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.4"
+
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: build
+      run: |
+        luarocks install luaunit
+        luarocks install luafilesystem
+        luarocks make rockspec/modest-0.1-1.rockspec
+
+    - name: test
+      run: |
+        lua run_tests.lua
+
+  test-lua-jit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "luajit-openresty"
+
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: build
+      run: |
+        luarocks install luaunit
+        luarocks install luafilesystem
+        luarocks make rockspec/modest-0.1-1.rockspec
+
+    - name: test
+      run: |
+        luajit run_tests.lua
