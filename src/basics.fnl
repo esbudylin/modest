@@ -21,6 +21,10 @@
 
 (local Interval {})
 
+;; luajit support
+(fn floor-/ [a b]
+  (math.floor (/ a b)))
+
 (fn accidental-to-semitones [accidental]
   (match accidental
     :flat -1
@@ -54,7 +58,7 @@
   (let [acc-symbols (if ascii ascii-acc utf8-acc)
         [single double] (if (< accidental 0) (car acc-symbols) (second acc-symbols))]
     (.. 
-     (string.rep double (// (math.abs accidental) 2))
+     (string.rep double (floor-/ (math.abs accidental) 2))
      (if (= 1 (% accidental 2)) single ""))))
 
 (fn find-in-octave [{: tone}]
@@ -81,7 +85,7 @@
   (let [target-semitones (Interval.semitones interval)
         octave-pos (+ (find Octave tone) (* direction (- size 1)))
         new-tone (circular-index Octave octave-pos)
-        octave-diff (math.abs (// (- octave-pos 1) (length Octave)))
+        octave-diff (math.abs (floor-/ (- octave-pos 1) (length Octave)))
         new-octave (when octave (+ octave (* direction octave-diff)))
         diff (- target-semitones
                 (semitone-interval-between-tones [tone new-tone]
