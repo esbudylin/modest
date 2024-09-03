@@ -16,6 +16,10 @@
        (fn ,foo [...]
          ((partial ,advice bar#) ...)))))
 
+;; luajit support
+(when _G.unpack
+  (tset table :unpack _G.unpack))
+
 (fn parse [grammar str]
   (or (grammar:match str)
       (error (.. "Can't parse: " str))))

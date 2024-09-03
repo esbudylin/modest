@@ -4,7 +4,7 @@
                   b
                   (let [val (. bindings (- i 1))]
                     `(if (= ,val nil) ,b ,val))))]
-    `(let ,tbl ,(table.unpack body))))
+    `(let ,tbl ,((or unpack table.unpack) body))))
 
 (fn apply [f args]
   (f (table.unpack args)))
