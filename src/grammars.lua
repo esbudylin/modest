@@ -55,12 +55,12 @@ local chord = {
    crossed_o = utfR(0x00F8, 0x00F8),
    aug = Cg(Cc "aug", "triad") * (P "+" + P "aug") * (V "maj_7" * #V "extended_seventh") ^ -1,
 
-   sixth = (S "6" / tonumber),
+   sixth =  Cg(S "6" / tonumber, "ext"),
    seventh = (S "79" + P "11" + P "13" + P "15") / tonumber,
 
    extended_seventh = Cg(V "seventh", "ext"),
 
-   extended_sixth = Cg(V "sixth", "ext") * (V "sixth_add9" * - #V "add") ^ -1,
+   extended_sixth = V "sixth" * (V "sixth_add9" * - #V "add") ^ -1,
    sixth_add9 = Cg("/" * (S "9" / tonumber), "add"), -- matches 6/9 chords
 
    extended = V "extended_seventh" + V "extended_sixth",
