@@ -1,13 +1,17 @@
+;; luajit support
+(local unpack
+       (or _G.unpack table.unpack))
+
 (macro let-default [bindings & body]
   (let [tbl (icollect [i b (ipairs bindings)]
               (if (~= 0 (% i 2))
                   b
                   (let [val (. bindings (- i 1))]
                     `(if (= ,val nil) ,b ,val))))]
-    `(let ,tbl ,((or unpack table.unpack) body))))
+    `(let ,tbl ,(unpack body))))
 
 (fn apply [f args]
-  (f (table.unpack args)))
+  (f (unpack args)))
 
 (fn map [foo v]
   (icollect [_ i (ipairs v)]
@@ -33,13 +37,13 @@
   (. v 2))
 
 (fn cdr [v]
-  [(table.unpack v 2)])
+  [(unpack v 2)])
 
 (fn last [v]
   (. v (length v)))
 
 (fn cons [a v]
-  [a (table.unpack v)])
+  [a (unpack v)])
 
 (fn conj [t v]
   (table.insert t v)
@@ -115,7 +119,7 @@
   res)
 
 (fn slice [coll a b]
-  [(table.unpack coll a b)])
+  [(unpack coll a b)])
 
 (fn sum [& nums]
   (accumulate [acc 0 _ n (ipairs nums)]

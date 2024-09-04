@@ -4,9 +4,11 @@ local lib = require('init')
 local Note = lib.Note
 local Interval = lib.Interval
 
+local unpack = unpack or table.unpack
+
 local function assert_intervals(test_cases)
    for _, test_case in ipairs(test_cases) do
-      local note1, note2, interval, semitones = table.unpack(test_case)
+      local note1, note2, interval, semitones = unpack(test_case)
       local transposition = test_case.transposition or note2
 
       luaunit.assertEquals(Interval.identify(note1, note2):tostring(), interval,

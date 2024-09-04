@@ -1,9 +1,5 @@
 ;; public interface of the library
 
-;; luajit support
-(when _G.unpack
-  (tset table :unpack _G.unpack))
-
 (local b (require :src.basics))
 (local (Interval Note) (values b.Interval b.Note))
 (local Chord (require :src.chord))

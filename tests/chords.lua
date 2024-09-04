@@ -3,6 +3,8 @@ local lib = require('init')
 
 local u = require('utils')
 
+local unpack = unpack or table.unpack
+
 -- most of test cases in this file are based on the test suites of teoria and sharp11 libraries
 -- https://github.com/jsrmath/sharp11/blob/master/test/chord.test.js
 -- https://github.com/saebekassebil/teoria/blob/master/test/chords.js
@@ -179,7 +181,7 @@ function test_chord_transposition()
    }
 
    for _, test in ipairs(chords) do
-      local chord, transposed_chord, interval = table.unpack(test)
+      local chord, transposed_chord, interval = unpack(test)
       local parsed_interval = lib.Interval.fromstring(interval)
 
       local get_transpose_result = function(i)
