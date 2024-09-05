@@ -6,11 +6,24 @@ Musical harmony library for Lua.
 * Installation
 The easiest way to install Modest is via LuaRocks.
 
-#+begin_src
+#+begin_src sh
 luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspec/modest-0.1-1.rockspec
 #+end_src
 
 * Documentation
+** General information
+- The library includes three objects: Chord, Interval, and Note.
+- Methods in the library do not mutate objects; instead, they return new instances.
+- Each object provides a 'fromstring' method, allowing object construction through string parsing. While Interval and Note requires strings in a strict format, Chord can parse almost any notation that may be encountered in musical scores or chord charts.
+- Any method that requires one of the library objects as an argument can also accept a string, which will be parsed using the appropriate 'fromstring' method. For example, both of the following expressions are valid.
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
+      local note = Note.fromstring("C5")
+      note:transpose("P5")
+      note:transpose(Interval.fromstring("P5"))
+    #+end_src
+
+    #+RESULTS:
+
 ** Chord
 *** Methods
 
@@ -279,4 +292,9 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     : D♯4
     : D#4
     : D#4
+
+* Similar libraries in other languages
+- [[https://github.com/bspaans/python-mingus][Mingus]] for Python,
+- [[https://github.com/jsrmath/sharp11][Sharp11]] for JavaScript,
+- [[https://github.com/saebekassebil/teoria][Teoria]] for JavaScript.
 

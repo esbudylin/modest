@@ -6,6 +6,7 @@ source = {
 }
 description = {
    homepage = "https://github.com/esbudylin/modest",
+   summary = "Musical harmony library",
    license = "Mozilla Public License Version 2.0"
 }
 dependencies = {
