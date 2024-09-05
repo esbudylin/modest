@@ -1,7 +1,7 @@
 package = "modest"
 version = "0.1-1"
 source = {
-   url = "git+ssh://git@github.com/esbudylin/modest.git",
+   url = "git://github.com/esbudylin/modest.git",
    tag = "0.1-1"
 }
 description = {
