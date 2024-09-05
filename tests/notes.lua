@@ -1,5 +1,5 @@
 local luaunit = require('luaunit')
-local lib = require('init')
+local lib = require('modest')
 
 local Note = lib.Note
 
