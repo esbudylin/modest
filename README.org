@@ -168,7 +168,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+end_src
 
     #+RESULTS:
-    : ./src/basics.lua:130: Invalid combination of size and quality
+    : /usr/local/share/lua/5.4/modest/basics.lua:134: Invalid combination of size and quality
 
 - identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
