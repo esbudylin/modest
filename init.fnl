@@ -1,13 +1,13 @@
 ;; public interface of the library
 
-(local b (require :src.basics))
+(local b (require :modest.basics))
 (local (Interval Note) (values b.Interval b.Note))
-(local Chord (require :src.chord))
+(local Chord (require :modest.chord))
 
-(local u (require :utils))
+(local u (require :modest.utils))
 (local apply u.apply)
 
-(local grammars (require :src.grammars))
+(local grammars (require :modest.grammars))
 
 ;; macro to monkey-patch a sequential table of functions
 (macro defadvice [foos advice]

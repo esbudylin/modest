@@ -19,9 +19,9 @@ build = {
    type = "fennel",
    modules = {
       ["modest"] = "init.fnl",
-      ["modest.utils"] = "utils.fnl",
-      ["modest.src.basics"] = "src/basics.fnl",
-      ["modest.src.chord"] = "src/chord.fnl",
-      ["modest.src.grammars"] = "src/grammars.lua"
+      ["modest.utils"] = "modest/utils.fnl",
+      ["modest.basics"] = "modest/basics.fnl",
+      ["modest.chord"] = "modest/chord.fnl",
+      ["modest.grammars"] = "modest/grammars.lua"
    },
 }

@@ -1,8 +1,8 @@
-(local b (require :src.basics))
+(local b (require :modest.basics))
 (local (Note Interval is-perfect semitone-interval accidental-to-string assoc-octave transpose-util)
        (values b.Note b.Interval b.is-perfect b.semitone-interval b.accidental-to-string b.assoc-octave b.transpose-util))
 
-(local u (require :utils))
+(local u (require :modest.utils))
 (local
  (map flatten-nested sort apply safe-cons index-by vals remove-keys copy conj)
  (values u.map u.flatten-nested u.sort u.apply u.safe-cons u.index-by u.vals u.remove-keys u.copy u.conj))

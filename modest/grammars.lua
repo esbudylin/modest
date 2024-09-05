@@ -1,5 +1,5 @@
 local lp = require "lpeg"
-local b = require "src.basics"
+local b = require "modest.basics"
 
 local S, R, P, V, C, Ct, Cc, Cg, utfR = lp.S, lp.R, lp.P, lp.V, lp.C, lp.Ct, lp.Cc, lp.Cg, lp.utfR
 local Note, Interval, accidental_to_semitones = b.Note, b.Interval, b.accidental_to_semitones

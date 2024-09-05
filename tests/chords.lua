@@ -1,7 +1,7 @@
 local luaunit = require('luaunit')
 local lib = require('init')
 
-local u = require('utils')
+local u = require('modest.utils')
 
 local unpack = unpack or table.unpack
 
