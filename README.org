@@ -135,7 +135,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : P4
 
-- new(size, quality="perefect") -> Note
+- new(size, quality="perfect") -> Note
   - Creates a new Interval object. Size should be an integer, and quality should be a string (valid options are "dim", "aug", "min", "maj", "perfect"). The method raises an error if the interval is invalid.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
