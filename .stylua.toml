@@ -1,0 +1,5 @@
+quote_style="AutoPreferDouble"
+call_parentheses="NoSingleString"
+indent_type="Spaces"
+indent_width=2
+collapse_simple_statement="FunctionOnly"
