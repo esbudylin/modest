@@ -3,17 +3,21 @@
 * Modest
 Musical harmony library for Lua.
 
-* Installation
-The easiest way to install Modest is via LuaRocks.
+** Installation
+The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
 
 #+begin_src sh
 luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspec/modest-0.1-1.rockspec
 #+end_src
 
-* Documentation
 ** General information
-- The library includes three objects: Chord, Interval, and Note.
+*** Lua version support
+- The library supports both Lua 5.4 and LuaJIT. It should also be compatible with older Lua 5.x versions.
+
+*** Immutability
 - Methods in the library do not mutate objects; instead, they return new instances.
+
+*** String parsing
 - Each object provides a 'fromstring' method, allowing object construction through string parsing. While Interval and Note requires strings in a strict format, Chord can parse almost any notation that may be encountered in musical scores or chord charts.
 - Any method that requires one of the library objects as an argument can also accept a string, which will be parsed using the appropriate 'fromstring' method. For example, both of the following expressions are valid.
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -24,8 +28,16 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 
     #+RESULTS:
 
-** Chord
-*** Methods
+*** Representation of accidentals
+- The library supports two types of accidental representation: special Unicode symbols ('♯' for sharp, '♭' for flat, '𝄪' for double sharp, '𝄫' for double flat) and ASCII characters ('#', 'b', 'x', 'bb', respectively).
+- The parsers of the Note and Chord objects can handle both types. When transforming these objects into strings, different methods are available for each representation (see below).
+
+*** Metamethods
+- Each object implements '__tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
+   
+** Documentation
+*** Chord
+**** Methods
 
 - fromstring(string) -> Chord
   - Parses a string and returns a Chord object.
@@ -75,7 +87,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 
 - numeric(self) -> [int]
   - Converts the chord into a numeric representation, with each note represented as the number of semitones from the C of the chord's root octave.
-  - Example:
+  - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
     local numeric = Chord.fromstring("C/Bb"):numeric()
     print(table.concat(numeric, ", "))
@@ -93,7 +105,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     : 7, 11, 14, 17, 21
 
 - tostring(self, ascii=nil) -> string
-  - Converts the chord into a string. By default accidental will be represented with special Unicode characters ('♯' for sharp, '♭' for flat, '𝄪' for double sharp, '𝄫' for double flat). Pass a true value as a parameter to get an ASCII representation ('#' for sharp, 'b' for flat, 'x' for double sharp, 'bb' for double flat).
+  - Converts the chord into a string. By default accidental will be represented with special Unicode characters. Pass a true value as a parameter to get an ASCII representation.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       local chord = Chord.fromstring("C#maj7")
@@ -116,8 +128,8 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : G7#11
 
-** Interval
-*** Methods
+*** Interval
+**** Methods
 
 - fromstring(string) -> Interval
   - Parses a string and returns an Interval object. Examples: 
@@ -203,8 +215,8 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+RESULTS:
     : m6
 
-** Note
-*** Methods
+*** Note
+**** Methods
 
 - fromstring(string) -> Note
   - Parses a string and returns a Note object.
@@ -293,8 +305,8 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     : D#4
     : D#4
 
-* Similar libraries in other languages
+** Similar libraries in other languages
 - [[https://github.com/bspaans/python-mingus][Mingus]] for Python,
 - [[https://github.com/jsrmath/sharp11][Sharp11]] for JavaScript,
-- [[https://github.com/saebekassebil/teoria][Teoria]] for JavaScript.
-
+- [[https://github.com/saebekassebil/teoria][Teoria]] for JavaScript,
+- [[https://github.com/tonaljs/tonal][Tonal]] for JavaScript.
