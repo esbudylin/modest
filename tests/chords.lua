@@ -152,15 +152,16 @@ end
 
 function test_chord_tostring()
   local chords = {
-    { chord = "Cø", to_string = "C7b5" },
+    { chord = "Cø", to_string = "C7(b5)" },
     { chord = "Ab6/9" },
     { chord = "C6" },
-    { chord = "D13#5b9" },
+    { chord = "D13#5b9", to_string = "D13(#5b9)" },
     { chord = "C/Bb" },
     { chord = "CM7" },
     { chord = "CmM7" },
     { chord = "Eaug" },
     { chord = "F5" },
+    { chord = "F(#11)" },
   }
 
   for _, test in ipairs(chords) do

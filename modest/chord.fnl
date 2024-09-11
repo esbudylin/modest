@@ -68,7 +68,7 @@
     :min :m
     :power :5
     [:sus step] (.. :sus step)
- ; half-diminished chord is handled as a 7b5 chord due to the lack of an ascii symbol for it
+ ; half-diminished chord is handled as a 7(b5) chord due to the lack of an ascii symbol for it
     (where (or :maj :half-dim)) ""
     _ triad))
 
@@ -80,10 +80,13 @@
   (let [alterations (-> (or alterations [])
                         (copy)
                         (conj (when (= triad :half-dim) [-1 5]))
-                        (sort #(. $1 2)))]
-    (accumulate [res ""
-                 _ [acc interval-size] (ipairs alterations)]
-      (.. res (accidental-to-string acc ascii) interval-size))))
+                        (sort #(. $1 2)))
+        alteration-string (accumulate [res ""
+                                       _ [acc interval-size] (ipairs alterations)]
+                            (.. res (accidental-to-string acc ascii) interval-size))]
+    (if (= alteration-string "")
+      alteration-string
+      (.. "(" alteration-string ")"))))
 
 (fn add-to-string [{: add : ext}]
   (when add
