@@ -1,5 +1,4 @@
 #+OPTIONS: ^:nil
-#+PROPERTY: header-args :eval no
 
 * Modest
 Musical harmony library for Lua.
@@ -132,7 +131,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
     #+end_src
 
     #+RESULTS:
-    : G7#11
+    : G7(#11)
 
 *** Interval
 **** Methods
