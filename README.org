@@ -1,4 +1,5 @@
 #+OPTIONS: ^:nil
+#+PROPERTY: header-args :eval no
 
 * Modest
 Musical harmony library for Lua.
@@ -10,7 +11,12 @@ The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
 luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspec/modest-0.1-1.rockspec
 #+end_src
 
-** General information
+** Features
+- Chord Object. Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
+- Note Object. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
+- Interval Object. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
+
+** General Information
 *** Lua version support
 - The library supports both Lua 5.4 and LuaJIT. It should also be compatible with older Lua 5.x versions.
 
