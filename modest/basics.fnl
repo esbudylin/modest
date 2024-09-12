@@ -3,10 +3,10 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
-(local u (require :modest.utils))
 (local
- (contains? find circular-index map slice apply sum car second swap)
- (values u.contains? u.find u.circular-index u.map u.slice u.apply u.sum u.car u.second u.swap))
+ {: contains? : find : circular-index : map
+  : slice : apply : sum : car : second : swap}
+ (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
 

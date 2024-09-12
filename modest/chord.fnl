@@ -1,11 +1,10 @@
-(local b (require :modest.basics))
-(local (Note Interval is-perfect semitone-interval accidental-to-string assoc-octave transpose-util)
-       (values b.Note b.Interval b.is-perfect b.semitone-interval b.accidental-to-string b.assoc-octave b.transpose-util))
+(local {: Note : Interval : is-perfect : semitone-interval
+         : accidental-to-string : assoc-octave : transpose-util}
+       (require :modest.basics))
 
-(local u (require :modest.utils))
-(local
- (map flatten-nested sort apply safe-cons index-by vals remove-keys copy conj)
- (values u.map u.flatten-nested u.sort u.apply u.safe-cons u.index-by u.vals u.remove-keys u.copy u.conj))
+(local {: map : flatten-nested : sort : apply : safe-cons
+         : index-by : vals : remove-keys : copy : conj}
+       (require :modest.utils))
 
 (fn build-triad [{: triad}]
   (case triad

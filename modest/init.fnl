@@ -1,11 +1,9 @@
 ;; public interface of the library
 
-(local b (require :modest.basics))
-(local (Interval Note) (values b.Interval b.Note))
+(local {: Interval : Note} (require :modest.basics))
 (local Chord (require :modest.chord))
 
-(local u (require :modest.utils))
-(local apply u.apply)
+(local {: apply} (require :modest.utils))
 
 (local grammars (require :modest.grammars))
 
