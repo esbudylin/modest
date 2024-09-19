@@ -20,7 +20,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
 - The library supports both Lua 5.4 and LuaJIT. It should also be compatible with older Lua 5.x versions.
 
 *** Immutability
-- Methods in the library do not mutate objects; instead, they return new instances.
+- Methods in the library do not mutate objects; instead, they return new instances. However, as these instances are regular Lua tables, they can still be modified after creation. It is strongly advised *not* to mutate them, as this could lead to unexpected behavior.
 
 *** String parsing
 - Each object provides a 'fromstring' method, allowing object construction through string parsing. While Interval and Note requires strings in a strict format, Chord can parse almost any notation that may be encountered in musical scores or chord charts.
@@ -213,7 +213,7 @@ luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspe
   - Converts the interval into a string representation.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local interval = Interval.new(6, "min")
+    local interval = Interval.new(6, "min"):tostring()
     print(interval)
     #+end_src
 
