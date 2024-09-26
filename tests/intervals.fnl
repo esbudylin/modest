@@ -7,13 +7,13 @@
 (fn assert-intervals [note1 note2 interval semitones transposition]
   (local transposition (or transposition note2))
   (local parsed-interval (Interval.fromstring interval))
-  (assertEquals (: (Interval.identify note1 note2) :tostring)
+  (assertEquals (tostring (Interval.identify note1 note2))
                 interval
                 "Mismatched interval name")
-  (assertEquals (: (Interval.identify note1 note2) :semitones)
+  (assertEquals (Interval.semitones (Interval.identify note1 note2))
                 semitones
                 "Mismatched semitones")
-  (assertEquals (: (Interval.identify (note1:toascii) (note2:toascii)) :tostring)
+  (assertEquals (tostring (Interval.identify (note1:toascii) (note2:toascii)))
                 interval
                 "Can't identify interval by strings")
   (assertEquals (note1:transpose parsed-interval)

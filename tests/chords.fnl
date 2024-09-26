@@ -12,8 +12,9 @@
 
 (fn test-notes [chord notes octave]
   (assertEquals (map tostring
-                             (: (Chord.fromstring chord) :notes octave))
-                        notes (.. "Mismatched notes for chord: " chord)))
+                     (-> chord Chord.fromstring (Chord.notes octave)))
+                notes
+                (.. "Mismatched notes for chord: " chord)))
 
 (parameterized :symbol_aliases
                [["C∆7" [:C :E :G :B]]
@@ -171,7 +172,7 @@
            [:Cdim [0 3 6]]
            [:Cdim7 [0 3 6 9]]]
  (fn [chord numeric]
-   (assertEquals (: (Chord.fromstring chord) :numeric) numeric
+   (assertEquals (-> chord Chord.fromstring Chord.numeric) numeric
                  (.. "Mismatched numeric notation for chord: " chord))))
 
 (parameterized
@@ -200,11 +201,10 @@
    (local parsed-interval (Interval.fromstring interval))
 
    (fn get-transpose-result [i]
-     (: (: (Chord.fromstring chord) :transpose i) :toascii))
+     (-> chord Chord.fromstring (Chord.transpose i) Chord.toascii))
 
    (fn get-transpose-down-result [i]
-     (: (: (Chord.fromstring transposed) :transpose_down i)
-        :toascii))
+     (-> transposed Chord.fromstring (Chord.transpose_down i) Chord.toascii))
 
    (assertEquals (get-transpose-result parsed-interval)
                  (get-transpose-result interval)
