@@ -3,7 +3,7 @@
        (require :modest.basics))
 
 (local {: map : flatten-nested : sort : apply : safe-cons
-         : index-by : vals : remove-keys : copy : conj}
+         : index-by : vals : remove-keys : copy : conj : reduce}
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -38,7 +38,7 @@
   (if alterations
       (let [alt-map (collect [_ [acc interval-size] (ipairs alterations)]
                       (values interval-size acc))
-            interval-map (index-by intervals #(. $1 :size))]
+            interval-map (index-by intervals #(. $ :size))]
         (each [size alt (pairs alt-map)]
           (let [{: quality} (or (. interval-map size) {})]
             (tset interval-map size (Interval.new size (+ (or quality 0) alt)))))
@@ -51,7 +51,7 @@
 
 (fn transpose [v root]
   (let [inter (semitone-interval (Note.new :C) root)]
-    (map #(+ inter $1) v)))
+    (map #(+ inter $) v)))
 
 (fn root [] [1])
 
@@ -79,7 +79,7 @@
   (let [alterations (-> (or alterations [])
                         (copy)
                         (conj (when (= triad :half-dim) [-1 5]))
-                        (sort #(. $1 2)))
+                        (sort #(. $ 2)))
         alteration-string (accumulate [res ""
                                        _ [acc interval-size] (ipairs alterations)]
                             (.. res (accidental-to-string acc ascii) interval-size))]
@@ -94,10 +94,9 @@
 ;; transforms a parsed chord suffix (e.g. mM7, aug, dim7) into a string
 (fn suffix-to-string [suffix ascii]
   (let [foos [quality-to-string ext-to-string
-              add-to-string #(alterations-to-string $1 ascii)]
-        strings (map #($1 suffix) foos)]
-    (accumulate [res "" _ s (ipairs strings)]
-      (.. res s))))
+              add-to-string #(alterations-to-string $ ascii)]
+        strings (map #($ suffix) foos)]
+    (reduce #(.. $ $2) strings "")))
 
 (local Chord {})
 
@@ -124,7 +123,7 @@
   (chord-transpose-util self interval -1))
 
 (fn Chord.tostring [{: root : bass : suffix} ascii]
-  (local str-func #(Note.tostring $1 ascii))
+  (local str-func #(Note.tostring $ ascii))
   (.. (str-func root)
       (suffix-to-string suffix ascii)
       (if bass (.. "/" (str-func bass)) "")))
@@ -134,7 +133,7 @@
 (fn Chord.transform [t]
   (let [foos [root build-triad add-7 extend added]
         intervals (map (partial apply Interval.new)
-                       (flatten-nested (map #($1 t) foos)))
+                       (flatten-nested (map #($ t) foos)))
         alterated (sort (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass

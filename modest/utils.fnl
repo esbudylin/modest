@@ -61,8 +61,7 @@
   (= (type v) :table))
 
 (fn find [coll el acc]
-  (let-default
-   [acc 1]
+  (let-default [acc 1]
    (if (empty? coll) nil
        (= (car coll) el) acc
        (find (cdr coll) el (+ acc 1)))))
@@ -71,12 +70,11 @@
   (not= (find coll el) nil))
 
 (fn sort [coll comp]
-  (table.sort coll (when comp #(< (comp $1) (comp $2))))
+  (table.sort coll (when comp #(< (comp $) (comp $2))))
   coll)
 
 (fn flatten [v fcond acc]
-  (let-default
-   [acc [] fcond (fn [] true)]
+  (let-default [acc [] fcond (fn [] true)]
    (if (empty? v) acc
        (and (table? (car v)) (fcond (car v)))
        (flatten (cdr v)
@@ -87,10 +85,10 @@
                 (conj acc (car v))))))
 
 (fn nested? [v]
-  (not (empty? (filter #(= (type $1) :table) v))))
+  (not (empty? (filter table? v))))
 
 (fn flatten-nested [lol]
-  (flatten lol #(nested? $1)))
+  (flatten lol nested?))
 
 (fn circular [t]
   (local n (length t))
