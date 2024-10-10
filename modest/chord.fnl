@@ -1,6 +1,6 @@
-(local {: map : mapv : apply : vector : every?
+(local {: map : mapv : apply : vector
         : vals : dissoc : conj : reduce
-        : hash-map : into : reduce : assoc }
+        : hash-map : into : assoc }
        (require :cljlib))
 
 (local {: Note : Interval : is-perfect : semitone-interval
@@ -9,8 +9,6 @@
 
 (local {: flatten-nested : sort-transformed  : safe-prepend }
        (require :modest.utils))
-
-(import-macros {: if-let} (doto :cljlib require))
 
 (fn build-triad [{: triad}]
   (case triad
@@ -86,9 +84,9 @@
   (let [alterations (-> (or alterations [])
                         (conj (when (= triad :half-dim) [-1 5]))
                         (sort-transformed #(. $ 2)))
-        alteration-string (accumulate [res ""
-                                       _ [acc interval-size] (ipairs alterations)]
-                            (.. res (accidental-to-string acc ascii) interval-size))]
+        alteration-string (reduce (fn [res [acc size]]
+                                    (.. res (accidental-to-string acc ascii) size))
+                                  "" alterations)]
     (if (= alteration-string "")
       alteration-string
       (.. "(" alteration-string ")"))))
