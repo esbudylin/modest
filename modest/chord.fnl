@@ -1,9 +1,13 @@
+(local {: map : mapv : apply : vector
+        : vals : dissoc : conj : reduce
+        : hash-map : into : assoc }
+       (require :cljlib))
+
 (local {: Note : Interval : is-perfect : semitone-interval
          : accidental-to-string : assoc-octave : transpose-util}
        (require :modest.basics))
 
-(local {: map : flatten-nested : sort : apply : safe-cons
-         : index-by : vals : remove-keys : copy : conj : reduce}
+(local {: flatten-nested : sort-transformed  : safe-prepend }
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -36,13 +40,14 @@
 
 (fn alterate [intervals {: alterations}]
   (if alterations
-      (let [alt-map (collect [_ [acc interval-size] (ipairs alterations)]
-                      (values interval-size acc))
-            interval-map (index-by intervals #(. $ :size))]
-        (each [size alt (pairs alt-map)]
-          (let [{: quality} (or (. interval-map size) {})]
-            (tset interval-map size (Interval.new size (+ (or quality 0) alt)))))
-        (vals interval-map))
+      (let [interval-map (into (hash-map)
+                               (map (fn [i] [(. i :size) i]) intervals))
+            alterated-map (reduce (fn [acc [alt size]]
+                                    (let [quality (or (-?> interval-map (. size) (. :quality)) 0)]
+                                      (assoc acc size  (Interval.new size (+ quality alt)))))
+                                  interval-map
+                                  alterations)]
+        (into (vector) (vals alterated-map)))
       intervals))
 
 (fn num-bass [{: root : bass}]
@@ -51,7 +56,7 @@
 
 (fn transpose [v root]
   (let [inter (semitone-interval (Note.new :C) root)]
-    (map #(+ inter $) v)))
+    (mapv #(+ inter $) v)))
 
 (fn root [] [1])
 
@@ -77,12 +82,11 @@
 
 (fn alterations-to-string [{: alterations : triad} ascii]
   (let [alterations (-> (or alterations [])
-                        (copy)
                         (conj (when (= triad :half-dim) [-1 5]))
-                        (sort #(. $ 2)))
-        alteration-string (accumulate [res ""
-                                       _ [acc interval-size] (ipairs alterations)]
-                            (.. res (accidental-to-string acc ascii) interval-size))]
+                        (sort-transformed #(. $ 2)))
+        alteration-string (reduce (fn [res [acc size]]
+                                    (.. res (accidental-to-string acc ascii) size))
+                                  "" alterations)]
     (if (= alteration-string "")
       alteration-string
       (.. "(" alteration-string ")"))))
@@ -95,8 +99,8 @@
 (fn suffix-to-string [suffix ascii]
   (let [foos [quality-to-string ext-to-string
               add-to-string #(alterations-to-string $ ascii)]
-        strings (map #($ suffix) foos)]
-    (reduce #(.. $ $2) strings "")))
+        strings (mapv #($ suffix) foos)]
+    (reduce #(.. $ $2) strings)))
 
 (local Chord {})
 
@@ -109,12 +113,14 @@
     chord))
 
 (fn Chord.numeric [{: root : intervals &as t}]
-  (safe-cons (num-bass t)
-             (transpose (map Interval.semitones intervals) root)))
+  (safe-prepend
+   (num-bass t)
+   (transpose (mapv Interval.semitones intervals) root)))
 
 (fn Chord.notes [{: intervals : root &as t} octave]
-  (safe-cons (bass-with-octave t octave)
-             (map (partial Note.transpose (assoc-octave root octave)) intervals)))
+  (safe-prepend
+   (bass-with-octave t octave)
+   (mapv (partial Note.transpose (assoc-octave root octave)) intervals)))
 
 (fn Chord.transpose [self interval]
   (chord-transpose-util self interval 1))
@@ -132,13 +138,13 @@
 
 (fn Chord.transform [t]
   (let [foos [root build-triad add-7 extend added]
-        intervals (map (partial apply Interval.new)
+        intervals (mapv (partial apply Interval.new)
                        (flatten-nested (map #($ t) foos)))
-        alterated (sort (alterate intervals t) Interval.semitones)
+        alterated (sort-transformed (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass
                :root t.root
-               :suffix (remove-keys t :root :bass)}]
+               :suffix (dissoc t :root :bass)}]
     (setmetatable chord {:__index Chord :__tostring Chord.tostring})
     chord))
 

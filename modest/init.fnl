@@ -3,7 +3,7 @@
 (local {: Interval : Note} (require :modest.basics))
 (local Chord (require :modest.chord))
 
-(local {: apply} (require :modest.utils))
+(local {: apply} (require :cljlib))
 
 (local grammars (require :modest.grammars))
 
