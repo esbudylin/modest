@@ -4,14 +4,17 @@
   `(when (not ,cond) (error ,message)))
 
 (local
- {: contains? : find : circular-index : map
-  : slice : apply : sum : car : second : swap}
+ {: contains? : map : dec : apply : add : first}
+ (require :cljlib))
+
+(local
+ {: index-of : circular-index : slice : second : swap}
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
 
 (local Tones [2 2 1 2 2 2 1])
-(local octave-semitones (apply sum Tones))
+(local octave-semitones (apply add Tones))
 
 (local Perfect-Intervals [1 4 5])
 (fn is-perfect [size]
@@ -56,13 +59,13 @@
 
 (fn accidental-to-string [accidental ascii]
   (let [acc-symbols (if ascii ascii-acc utf8-acc)
-        [single double] (if (< accidental 0) (car acc-symbols) (second acc-symbols))]
+        [single double] (if (< accidental 0) (first acc-symbols) (second acc-symbols))]
     (.. 
      (string.rep double (floor-/ (math.abs accidental) 2))
      (if (= 1 (% accidental 2)) single ""))))
 
 (fn find-in-octave [{: tone}]
-  (find Octave tone))
+  (index-of tone Octave))
 
 (fn assoc-octave [{: tone : accidental} octave]
   (Note.new tone accidental octave))
@@ -83,9 +86,9 @@
 
 (fn transpose-util [{: tone : octave : accidental} {: size &as interval} direction]
   (let [target-semitones (Interval.semitones interval)
-        octave-pos (+ (find Octave tone) (* direction (- size 1)))
+        octave-pos (+ (index-of tone Octave) (* direction (dec size)))
         new-tone (circular-index Octave octave-pos)
-        octave-diff (math.abs (floor-/ (- octave-pos 1) (length Octave)))
+        octave-diff (math.abs (floor-/ (dec octave-pos) (length Octave)))
         new-octave (when octave (+ octave (* direction octave-diff)))
         diff (- target-semitones
                 (semitone-interval-between-tones [tone new-tone]
@@ -110,8 +113,8 @@
     r))
 
 (fn Note.pitch_class [{: tone : accidental}]
-  (let [pos (find Octave tone)
-        ht (apply sum (slice Tones 1 (- pos 1)))]
+  (let [pos (index-of tone Octave)
+        ht (apply add (slice Tones 1 (- pos 1)))]
     (% (+ accidental ht) octave-semitones)))
 
 (fn Note.transpose [self interval]
