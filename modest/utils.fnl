@@ -1,8 +1,5 @@
-(local {: apply : range : keys : mapcat : inc : concat : into : vector
-        : first : rest : map : empty? : contains? : reduce : nth : sort
-        : add : last : filter : mapv : conj : dissoc : merge-with : vals} (require :cljlib))
-
-(import-macros {: defn} (doto :cljlib require))
+(local {: apply : range : mapcat : inc : concat : into : vector
+        : map : empty? : nth : sort : add : filter : merge-with} (require :cljlib))
 
 (fn second [v]
   (. v 2))
@@ -10,11 +7,13 @@
 (fn table? [v]
   (= (type v) :table))
 
-(defn index-of
-  ([el coll] (index-of el coll 1))
-  ([el coll acc] (if (empty? coll) nil
-                     (= (first coll) el) acc
-                     (index-of el (rest coll) (+ acc 1)))))
+(fn index-of [el coll]
+  (var res nil)
+  (var i 1)
+  (while (not res)
+    (when (= el (. coll i)) (set res i))
+    (set i (+ i 1)))
+  res)
 
 (fn sort-transformed [coll comp]
   (sort #(< (comp $) (comp $2)) coll))
