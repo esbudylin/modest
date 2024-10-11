@@ -1,7 +1,7 @@
 (local {: assertEquals} (require :luaunit))
 
 (local {: Chord : Interval} (require :modest))
-(local {: mapv} (require :cljlib))
+(local {: mapv} (require :modest.utils))
 
 (import-macros {: parameterized} :test-macros)
 

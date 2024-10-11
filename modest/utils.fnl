@@ -1,8 +1,21 @@
-(local {: apply : range : keys : mapcat : inc : concat : into : vector
-        : first : rest : map : empty? : contains? : reduce : nth : sort
-        : add : last : filter : mapv : conj : dissoc : merge-with : vals} (require :cljlib))
+;; luajit support
+(local unpack
+       (or _G.unpack table.unpack))
 
-(import-macros {: defn} (doto :cljlib require))
+(local {: range : map : nth : reduce : chain
+        : filter : totable : head : tail} (require :fun))
+
+(fn apply [f args]
+  (f (unpack args)))
+
+;; special utility to handle function application
+;; for objects produced by the LuaFun library
+(fn apply-iter [f args]
+  (let [arg (nth 1 args)
+        args (tail args)]
+    (if arg
+        (apply-iter (partial f arg) args)
+        (f))))
 
 (fn second [v]
   (. v 2))
@@ -10,27 +23,34 @@
 (fn table? [v]
   (= (type v) :table))
 
-(defn index-of
-  ([el coll] (index-of el coll 1))
-  ([el coll acc] (if (empty? coll) nil
-                     (= (first coll) el) acc
-                     (index-of el (rest coll) (+ acc 1)))))
+(fn inc [i]
+  (+ 1 i))
+
+(fn dec [i]
+  (- i 1))
+
+(fn sum [& nums]
+  (reduce #(+ $ $2) 0 nums))
 
 (fn sort-transformed [coll comp]
-  (sort #(< (comp $) (comp $2)) coll))
-
-(fn sum-tables [a b]
-  (apply merge-with add a b))
+  (table.sort coll #(< (comp $) (comp $2)))
+  coll)
 
 (fn slice [coll a b]
-  (map #(nth coll $) (range a (inc b))))
+  (map #(nth $ coll)
+       (range a b)))
 
 (fn circular-index [coll i]
   (let [index (% i (length coll))]
     (. coll (if (= index 0) (length coll) index))))
 
 (fn prepend [el t]
-  (into (vector) (concat [el] t)))
+  (table.insert t 1 el)
+  t)
+
+(fn conj [t v]
+  (table.insert t v)
+  t)
 
 (fn safe-prepend [el t]
   (if el (prepend el t) t))
@@ -38,8 +58,14 @@
 (fn swap [[a b]]
   [b a])
 
+(fn empty? [coll]
+  (= (nth 1 coll) nil))
+
 (fn nested? [v]
   (not (empty? (filter table? v))))
+
+(fn mapcat [f coll]
+  (apply chain (totable (map f coll))))
 
 (fn flatten-nested [coll]
   (mapcat
@@ -48,7 +74,45 @@
          x [x]))
    coll))
 
+(fn index-of [el coll]
+  (fn u [coll acc]
+    (if (empty? coll) nil
+        (= (head coll) el) acc
+        (u (tail coll) (+ acc 1))))
+  (u coll 1))
+
+(fn contains? [coll el]
+  (not= (index-of el coll) nil))
+
+(fn mapv [foo coll]
+  (totable (map foo coll)))
+
+(fn copy [t]
+  (local res {})
+  (each [k v (pairs t)]
+    (tset res k
+          (if (= (type v) :table) (copy v) v)))
+  res)
+
+(fn keys [m]
+  (icollect [k _ (pairs m)] k))
+
+(fn vals [m]
+  (icollect [_ v (pairs m)] v))
+
+(fn dissoc [t & keys]
+  (each [_ k (ipairs keys)]
+    (tset t k nil))
+  t)
+
+(fn assoc [t k v]
+  (tset t k v)
+  t)
+
 {: sort-transformed : table?
- : second : slice : index-of
- : circular-index : sum-tables
- : safe-prepend : flatten-nested : swap}
+ : second : slice : index-of : dec
+ : circular-index : conj
+ : safe-prepend : flatten-nested : swap
+ : apply : inc : mapv : contains?
+ : sum : copy : keys : vals
+ : assoc : dissoc : apply-iter} 

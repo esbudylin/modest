@@ -3,18 +3,17 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
-(local
- {: contains? : map : dec : apply : add : first}
- (require :cljlib))
+(local {: head : tail } (require :fun))
 
 (local
- {: index-of : circular-index : slice : second : swap}
+ {: index-of : circular-index : slice : second : swap
+  : apply : mapv : dec : contains? : sum : apply-iter}
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
 
 (local Tones [2 2 1 2 2 2 1])
-(local octave-semitones (apply add Tones))
+(local octave-semitones (apply sum Tones))
 
 (local Perfect-Intervals [1 4 5])
 (fn is-perfect [size]
@@ -51,7 +50,7 @@
 
 (fn is-valid-interval [size quality]
   (and (or (and (is-perfect size) (not (contains? [:min :maj] quality)))
-           (and (not (is-perfect size)) (~= quality :perfect)))
+           (and (not (is-perfect size)) (not= quality :perfect)))
        (not (and (= size 1) (= quality :dim)))))
 
 (local ascii-acc [[:b :bb] [:# :x]])
@@ -59,7 +58,9 @@
 
 (fn accidental-to-string [accidental ascii]
   (let [acc-symbols (if ascii ascii-acc utf8-acc)
-        [single double] (if (< accidental 0) (first acc-symbols) (second acc-symbols))]
+        [single double] (if (< accidental 0)
+                            (head acc-symbols)
+                            (second acc-symbols))]
     (.. 
      (string.rep double (floor-/ (math.abs accidental) 2))
      (if (= 1 (% accidental 2)) single ""))))
@@ -114,7 +115,9 @@
 
 (fn Note.pitch_class [{: tone : accidental}]
   (let [pos (index-of tone Octave)
-        ht (apply add (slice Tones 1 (- pos 1)))]
+        ht (if (= pos 1)
+               0
+               (apply-iter sum (slice Tones 1 (dec pos))))]
     (% (+ accidental ht) octave-semitones)))
 
 (fn Note.transpose [self interval]
@@ -146,8 +149,8 @@
     t))
 
 (fn Interval.identify [a-note b-note]
-  (let [[a-pos b-pos] (map find-in-octave [a-note b-note])
-        [a-int b-int] (map Note.pitch_class [a-note b-note])
+  (let [[a-pos b-pos] (mapv find-in-octave [a-note b-note])
+        [a-int b-int] (mapv Note.pitch_class [a-note b-note])
         diminished-octave (and (= a-pos b-pos)
                                (> a-note.accidental b-note.accidental)) ;; e.g. a-note - C; b-note - Cb
         octave-offset (if (or diminished-octave (> a-pos b-pos)) 1 0)

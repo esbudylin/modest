@@ -1,13 +1,11 @@
-(local {: map : mapv : apply : vector
-        : vals : dissoc : conj : reduce
-        : hash-map : into : assoc }
-       (require :cljlib))
+(local {: reduce : map : tomap : totable} (require :fun))
 
 (local {: Note : Interval : is-perfect : semitone-interval
-         : accidental-to-string : assoc-octave : transpose-util}
+        : accidental-to-string : assoc-octave : transpose-util}
        (require :modest.basics))
 
-(local {: flatten-nested : sort-transformed  : safe-prepend }
+(local {: flatten-nested : sort-transformed : safe-prepend
+        : conj : apply : copy : mapv : vals : assoc : dissoc}
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -40,14 +38,16 @@
 
 (fn alterate [intervals {: alterations}]
   (if alterations
-      (let [interval-map (into (hash-map)
-                               (map (fn [i] [(. i :size) i]) intervals))
-            alterated-map (reduce (fn [acc [alt size]]
-                                    (let [quality (or (-?> interval-map (. size) (. :quality)) 0)]
-                                      (assoc acc size  (Interval.new size (+ quality alt)))))
-                                  interval-map
-                                  alterations)]
-        (into (vector) (vals alterated-map)))
+      (let [interval-map
+            (tomap (map (fn [i] (values (. i :size) i)) intervals))
+            alterated-map
+            (reduce (fn [acc [alt size]]
+                      (let [quality (or (-?> interval-map (. size) (. :quality)) 0)]
+                        (assoc acc size
+                               (Interval.new size (+ quality alt)))))
+                    interval-map
+                    alterations)]
+        (vals alterated-map))
       intervals))
 
 (fn num-bass [{: root : bass}]
@@ -56,7 +56,7 @@
 
 (fn transpose [v root]
   (let [inter (semitone-interval (Note.new :C) root)]
-    (mapv #(+ inter $) v)))
+    (map #(+ inter $) v)))
 
 (fn root [] [1])
 
@@ -82,6 +82,7 @@
 
 (fn alterations-to-string [{: alterations : triad} ascii]
   (let [alterations (-> (or alterations [])
+                        (copy)
                         (conj (when (= triad :half-dim) [-1 5]))
                         (sort-transformed #(. $ 2)))
         alteration-string (reduce (fn [res [acc size]]
@@ -100,7 +101,7 @@
   (let [foos [quality-to-string ext-to-string
               add-to-string #(alterations-to-string $ ascii)]
         strings (mapv #($ suffix) foos)]
-    (reduce #(.. $ $2) strings)))
+    (reduce #(.. $ $2) "" strings)))
 
 (local Chord {})
 
@@ -115,12 +116,14 @@
 (fn Chord.numeric [{: root : intervals &as t}]
   (safe-prepend
    (num-bass t)
-   (transpose (mapv Interval.semitones intervals) root)))
+   (totable
+    (transpose (map Interval.semitones intervals) root))))
 
 (fn Chord.notes [{: intervals : root &as t} octave]
   (safe-prepend
    (bass-with-octave t octave)
-   (mapv (partial Note.transpose (assoc-octave root octave)) intervals)))
+   (totable
+    (map (partial Note.transpose (assoc-octave root octave)) intervals))))
 
 (fn Chord.transpose [self interval]
   (chord-transpose-util self interval 1))
@@ -129,17 +132,17 @@
   (chord-transpose-util self interval -1))
 
 (fn Chord.tostring [{: root : bass : suffix} ascii]
-  (local str-func #(Note.tostring $ ascii))
-  (.. (str-func root)
-      (suffix-to-string suffix ascii)
-      (if bass (.. "/" (str-func bass)) "")))
+  (let [str-func #(Note.tostring $ ascii)]
+    (.. (str-func root)
+        (suffix-to-string suffix ascii)
+        (if bass (.. "/" (str-func bass)) ""))))
 
 (fn Chord.toascii [self] (Chord.tostring self true))
 
 (fn Chord.transform [t]
   (let [foos [root build-triad add-7 extend added]
-        intervals (mapv (partial apply Interval.new)
-                       (flatten-nested (map #($ t) foos)))
+        intervals (map (partial apply Interval.new)
+                       (flatten-nested (mapv #($ t) foos)))
         alterated (sort-transformed (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass
