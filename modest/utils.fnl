@@ -8,15 +8,6 @@
 (fn apply [f args]
   (f (unpack args)))
 
-;; special utility to handle function application
-;; for objects produced by the LuaFun library
-(fn apply-iter [f args]
-  (let [arg (nth 1 args)
-        args (tail args)]
-    (if arg
-        (apply-iter (partial f arg) args)
-        (f))))
-
 (fn second [v]
   (. v 2))
 
@@ -65,7 +56,7 @@
   (not (empty? (filter table? v))))
 
 (fn mapcat [f coll]
-  (apply chain (totable (map f coll))))
+  (reduce chain [] (map f coll)))
 
 (fn flatten-nested [coll]
   (mapcat
@@ -115,4 +106,4 @@
  : safe-prepend : flatten-nested : swap
  : apply : inc : mapv : contains?
  : sum : copy : keys : vals
- : assoc : dissoc : apply-iter} 
+ : assoc : dissoc } 

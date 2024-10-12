@@ -100,8 +100,8 @@
 (fn suffix-to-string [suffix ascii]
   (let [foos [quality-to-string ext-to-string
               add-to-string #(alterations-to-string $ ascii)]
-        strings (mapv #($ suffix) foos)]
-    (reduce #(.. $ $2) "" strings)))
+        strings (map #($ suffix) foos)]
+    (reduce #(.. $ (or $2 "")) "" strings)))
 
 (local Chord {})
 

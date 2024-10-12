@@ -3,11 +3,11 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
-(local {: head : tail } (require :fun))
+(local {: head : totable} (require :fun))
 
 (local
  {: index-of : circular-index : slice : second : swap
-  : apply : mapv : dec : contains? : sum : apply-iter}
+  : apply : mapv : dec : contains? : sum }
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
@@ -117,7 +117,7 @@
   (let [pos (index-of tone Octave)
         ht (if (= pos 1)
                0
-               (apply-iter sum (slice Tones 1 (dec pos))))]
+               (apply sum (totable (slice Tones 1 (dec pos)))))]
     (% (+ accidental ht) octave-semitones)))
 
 (fn Note.transpose [self interval]
