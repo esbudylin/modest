@@ -1,19 +1,20 @@
-package = "modest"
-version = "0.1-1"
+package = "modest-harmony"
+version = "scm-1"
 source = {
    url = "git://github.com/esbudylin/modest.git",
-   tag = "0.1-1"
 }
 description = {
    homepage = "https://github.com/esbudylin/modest",
    summary = "Musical harmony library",
+   detailed = "A library that provides methods for working with musical harmony — intervals, notes, chords. It supports flexible parsing of chord notation and can handle a wide range of chord types, from basic to complex.",
    license = "Mozilla Public License Version 2.0"
 }
 dependencies = {
    "lua >= 5.1, < 5.5",
-   "fennel ~> 1.5",
    "lpeg ~> 1.1",
+   "fennel ~> 1.5",
    "luarocks-build-fennel ~> 0.1",
+   "fun ~> 0.1",
 }
 build = {
    type = "fennel",
