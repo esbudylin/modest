@@ -13,6 +13,7 @@ dependencies = {
    "lpeg ~> 1.1",
    "fennel ~> 1.5",
    "luarocks-build-fennel ~> 0.1",
+   "fun ~> 0.1",
 }
 build = {
    type = "fennel",
