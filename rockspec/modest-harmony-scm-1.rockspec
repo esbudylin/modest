@@ -1,8 +1,7 @@
-package = "modest"
-version = "0.1-1"
+package = "modest-harmony"
+version = "scm-1"
 source = {
    url = "git://github.com/esbudylin/modest.git",
-   tag = "0.1-1"
 }
 description = {
    homepage = "https://github.com/esbudylin/modest",
@@ -12,8 +11,8 @@ description = {
 }
 dependencies = {
    "lua >= 5.1, < 5.5",
-   "fennel ~> 1.5",
    "lpeg ~> 1.1",
+   "fennel ~> 1.5",
    "luarocks-build-fennel ~> 0.1",
 }
 build = {

@@ -7,7 +7,7 @@ Musical harmony library for Lua.
 The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
 
 #+begin_src sh
-luarocks install https://raw.githubusercontent.com/esbudylin/modest/main/rockspec/modest-0.1-1.rockspec
+luarocks install modest-harmony
 #+end_src
 
 ** Features
