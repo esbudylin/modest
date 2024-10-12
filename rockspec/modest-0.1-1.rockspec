@@ -7,6 +7,7 @@ source = {
 description = {
    homepage = "https://github.com/esbudylin/modest",
    summary = "Musical harmony library",
+   detailed = "A library that provides methods for working with musical harmony — intervals, notes, chords. It supports flexible parsing of chord notation and can handle a wide range of chord types, from basic to complex.",
    license = "Mozilla Public License Version 2.0"
 }
 dependencies = {
