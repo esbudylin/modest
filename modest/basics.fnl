@@ -3,11 +3,11 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
-(local {: head : totable} (require :fun))
+(local {: head : totable : reduce : range} (require :fun))
 
 (local
  {: index-of : circular-index : slice : second : swap
-  : apply : mapv : dec : contains? : sum }
+  : apply : mapv : dec : contains? : sum : dec }
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
@@ -36,8 +36,10 @@
 
 ;; semitones for perfect and major intervals
 (fn base-interval [size]
-  (faccumulate [n 0 i 1 (- size 1)]
-    (+ n (circular-index Tones i))))
+  (if (= size 1)
+      0
+      (reduce #(+ $ (circular-index Tones $2)) 0
+              (range 1 (dec size)))))
 
 (fn semitone-interval [a b]
   (Interval.semitones (Interval.identify a b)))
