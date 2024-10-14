@@ -1,11 +1,5 @@
 ;; module implements Note and Interval
 
-;; macro to monkey-patch a function
-(macro advice [foo advice]
-  `(let [bar# ,foo]
-     (fn ,foo [...]
-       ((partial ,advice bar#) ...))))
-
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
@@ -166,7 +160,7 @@
     (setmetatable t {:__index Interval :__tostring Interval.tostring})
     t))
 
-(fn Interval.identify [a-note b-note]
+(fn identify-interval [a-note b-note]
   (let [[a-pos b-pos] (mapv find-in-octave [a-note b-note])
         [a-int b-int] (mapv Note.pitch_class [a-note b-note])
         diminished-octave (and (= a-pos b-pos)
@@ -185,13 +179,12 @@
      (+ size (if octaves (* octaves (length Octave)) 0))
      (- interval-ht base-ht))))
 
-(advice
-  Interval.identify
- (fn [foo & args]
-   (apply foo
-          (mapv
-           (partial parse-if-string grammars.note)
-           args))))
+;; allows to accept strings as arguments
+(fn Interval.identify [& args]
+  (apply identify-interval
+         (mapv
+          (partial parse-if-string grammars.note)
+          args)))
 
 (fn Interval.semitones [{: size : quality}]
   (let [base (base-interval size)]
