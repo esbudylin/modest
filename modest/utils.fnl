@@ -100,10 +100,22 @@
   (tset t k v)
   t)
 
+(fn parse [grammar str]
+  (or (grammar:match str)
+      (error (.. "Can't parse: " str))))
+
+(fn string? [str]
+  (= (type str) :string))
+
+(fn parse-if-string [grammar n]
+  (if (string? n)
+      (parse grammar n)
+      n))
+
 {: sort-transformed : table?
  : second : slice : index-of : dec
  : circular-index : conj
  : safe-prepend : flatten-nested : swap
  : apply : inc : mapv : contains?
  : sum : copy : keys : vals
- : assoc : dissoc } 
+ : assoc : dissoc : parse : parse-if-string} 

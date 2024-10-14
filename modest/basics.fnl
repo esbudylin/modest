@@ -1,5 +1,11 @@
 ;; module implements Note and Interval
 
+;; macro to monkey-patch a function
+(macro advice [foo advice]
+  `(let [bar# ,foo]
+     (fn ,foo [...]
+       ((partial ,advice bar#) ...))))
+
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
@@ -7,7 +13,8 @@
 
 (local
  {: index-of : circular-index : slice : second : swap
-  : apply : mapv : dec : contains? : sum : dec }
+  : apply : mapv : dec : contains? : sum
+  : parse : parse-if-string}
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
@@ -19,20 +26,9 @@
 (fn is-perfect [size]
   (contains? Perfect-Intervals (% size 7)))
 
-(local Note {})
-
-(local Interval {})
-
 ;; luajit support
 (fn floor-/ [a b]
   (math.floor (/ a b)))
-
-(fn accidental-to-semitones [accidental]
-  (match accidental
-    :flat -1
-    :sharp 1
-    :double-flat -2
-    :double-sharp 2))
 
 ;; semitones for perfect and major intervals
 (fn base-interval [size]
@@ -40,6 +36,26 @@
       0
       (reduce #(+ $ (circular-index Tones $2)) 0
               (range 1 (dec size)))))
+
+(local Note {})
+
+(local Interval {})
+
+(fn note-fromtable [t]
+  (apply Note.new t))
+
+(fn interval-fromtable [[quality size]]
+  (Interval.new size quality))
+
+(fn accidental->semitones [accidental]
+  (match accidental
+    :flat -1
+    :sharp 1
+    :double-flat -2
+    :double-sharp 2))
+
+(local grammars ((require :modest.grammars)
+                 note-fromtable interval-fromtable accidental->semitones))
 
 (fn semitone-interval [a b]
   (Interval.semitones (Interval.identify a b)))
@@ -58,7 +74,7 @@
 (local ascii-acc [[:b :bb] [:# :x]])
 (local utf8-acc [["♭" "𝄫"] ["♯" "𝄪"]])
 
-(fn accidental-to-string [accidental ascii]
+(fn accidental->string [accidental ascii]
   (let [acc-symbols (if ascii ascii-acc utf8-acc)
         [single double] (if (< accidental 0)
                             (head acc-symbols)
@@ -73,7 +89,7 @@
 (fn assoc-octave [{: tone : accidental} octave]
   (Note.new tone accidental octave))
 
-(fn quality-to-int [size quality]
+(fn quality->int [size quality]
   (case quality
     :aug 1
     :dim (if (is-perfect size) -1 -2)
@@ -87,7 +103,7 @@
     0 (if (is-perfect size) :P :M)
     1 :A))
 
-(fn transpose-util [{: tone : octave : accidental} {: size &as interval} direction]
+(fn transpose-util* [{: tone : octave : accidental} {: size &as interval} direction]
   (let [target-semitones (Interval.semitones interval)
         octave-pos (+ (index-of tone Octave) (* direction (dec size)))
         new-tone (circular-index Octave octave-pos)
@@ -97,11 +113,13 @@
                 (semitone-interval-between-tones [tone new-tone]
                                                  octave-diff direction))]
     (Note.new new-tone
-              (+ accidental (* direction diff))
-              new-octave)))
+          (+ accidental (* direction diff))
+          new-octave)))
 
-(fn Note.fromtable [t]
-  (apply Note.new t))
+(fn transpose-util [self interval direction]
+  (transpose-util* self
+   (parse-if-string grammars.interval interval)
+   direction))
 
 (fn Note.new [tone acc octave]
   (ensure (= (type tone) :string) "Invalid argument")
@@ -130,21 +148,19 @@
 
 (fn Note.tostring [{: tone : accidental : octave} ascii]
   (.. tone
-      (accidental-to-string accidental ascii)
+      (accidental->string accidental ascii)
       (or octave "")))
 
 (fn Note.toascii [note]
   (Note.tostring note true))
 
-(fn Interval.new [size quality]
+(lambda Interval.new [size ?quality]
   (let [quality
-        (case (type quality)
-          :number quality
-          :string (do (ensure (is-valid-interval size quality) "Invalid combination of size and quality")
-                      (quality-to-int size quality))
-          :nil (when (is-perfect size) 0))]
-    (ensure (not= size nil) "Size of interval is undefined")
-    (ensure (not= quality nil) (.. "Interval quality is undefined. Size " size))
+        (case (type ?quality)
+          :number ?quality
+          :string (do (ensure (is-valid-interval size ?quality) "Invalid combination of size and quality")
+                      (quality->int size ?quality))
+          :nil (if (is-perfect size) 0 (error "Interval quality is undefined")))]
     (ensure (> size 0) (.. "Size of interval must be a positive integer. Size " size))
     (local t {: size : quality})
     (setmetatable t {:__index Interval :__tostring Interval.tostring})
@@ -169,16 +185,26 @@
      (+ size (if octaves (* octaves (length Octave)) 0))
      (- interval-ht base-ht))))
 
+(advice
+  Interval.identify
+ (fn [foo & args]
+   (apply foo
+          (mapv
+           (partial parse-if-string grammars.note)
+           args))))
+
 (fn Interval.semitones [{: size : quality}]
   (let [base (base-interval size)]
     (+ base quality)))
 
-(fn Interval.fromtable [[quality size]]
-  (Interval.new size quality))
-
 (fn Interval.tostring [{: size &as self}]
   (.. (notate-quality self) size))
 
-{: Interval : Note : is-perfect : accidental-to-semitones : semitone-interval : accidental-to-string : assoc-octave : transpose-util
- :base_interval base-interval
- :accidental_to_semitones accidental-to-semitones}
+(fn Note.fromstring [str]
+  (parse grammars.note str)) 
+
+(fn Interval.fromstring [str]
+  (parse grammars.interval str))
+
+{: Interval : Note : is-perfect : semitone-interval : accidental->string
+ : assoc-octave : transpose-util : grammars}
