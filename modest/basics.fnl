@@ -8,7 +8,7 @@
 (local
  {: index-of : circular-index : slice : second : swap
   : apply : mapv : dec : contains? : sum
-  : parse : parse-if-string}
+  : parse : parse-if-string : dissoc! : copy}
  (require :modest.utils))
 
 (local Octave [:C :D :E :F :G :A :B])
@@ -124,7 +124,7 @@
   (let [r {:tone tone
            :accidental (or acc 0)
            :octave octave}]
-    (setmetatable r {:__index Note :__tostring Note.tostring})
+    (setmetatable r Note.mt)
     r))
 
 (fn Note.pitch_class [{: tone : accidental}]
@@ -157,7 +157,7 @@
           :nil (if (is-perfect size) 0 (error "Interval quality is undefined")))]
     (ensure (> size 0) (.. "Size of interval must be a positive integer. Size " size))
     (local t {: size : quality})
-    (setmetatable t {:__index Interval :__tostring Interval.tostring})
+    (setmetatable t Interval.mt)
     t))
 
 (fn identify-interval [a-note b-note]
@@ -198,6 +198,14 @@
 
 (fn Interval.fromstring [str]
   (parse grammars.interval str))
+
+(set Note.mt {:__index (dissoc! (copy Note)
+                                :new :fromstring :mt)
+              :__tostring Note.tostring})
+
+(set Interval.mt {:__index (dissoc! (copy Interval)
+                                    :new :identify :fromstring :mt)
+                  :__tostring Interval.tostring})
 
 {: Interval : Note : is-perfect : semitone-interval : accidental->string
  : assoc-octave : transpose-util : grammars}

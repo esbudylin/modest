@@ -112,7 +112,7 @@
                : suffix
                :bass (when bass (transpose-util bass interval dir))
                :root (transpose-util root interval dir)}]
-    (setmetatable chord {:__index Chord :__tostring Chord.tostring})
+    (setmetatable chord Chord.mt)
     chord))
 
 (fn Chord.fromstring [str]
@@ -125,7 +125,7 @@
                :bass t.bass
                :root t.root
                :suffix (dissoc! t :root :bass)}]
-    (setmetatable chord {:__index Chord :__tostring Chord.tostring})
+    (setmetatable chord Chord.mt)
     chord))
 
 (fn Chord.numeric [{: root : intervals &as t}]
@@ -152,5 +152,8 @@
         (if bass (.. "/" (str-func bass)) ""))))
 
 (fn Chord.toascii [self] (Chord.tostring self true))
+
+(set Chord.mt {:__index (dissoc! (copy Chord) :fromstring :mt)
+               :__tostring Chord.tostring})
 
 Chord
