@@ -179,7 +179,7 @@
      (+ size (if octaves (* octaves (length Octave)) 0))
      (- interval-ht base-ht))))
 
-;; allows to accept strings as arguments
+;; unlike identify-interval, this method can accept strings as arguments
 (fn Interval.identify [& args]
   (apply identify-interval
          (mapv
