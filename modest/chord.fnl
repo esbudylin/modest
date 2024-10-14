@@ -6,8 +6,8 @@
         : transpose-util}
        (require :modest.basics))
 
-(local {: flatten-nested : sort-transformed : safe-prepend : parse
-        : conj : apply : copy : mapv : vals : assoc : dissoc}
+(local {: flatten-nested : sort-transformed : safe-prepend! : parse
+        : conj! : apply : copy : mapv : vals : assoc! : dissoc!}
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -45,7 +45,7 @@
             alterated-map
             (reduce (fn [acc [alt size]]
                       (let [quality (or (-?> interval-map (. size) (. :quality)) 0)]
-                        (assoc acc size
+                        (assoc! acc size
                                (Interval.new size (+ quality alt)))))
                     interval-map
                     alterations)]
@@ -85,7 +85,7 @@
 (fn alterations->string [{: alterations : triad} ascii]
   (let [alterations (-> (or alterations [])
                         (copy)
-                        (conj (when (= triad :half-dim) [-1 5]))
+                        (conj! (when (= triad :half-dim) [-1 5]))
                         (sort-transformed #(. $ 2)))
         alteration-string (reduce (fn [res [acc size]]
                                     (.. res (accidental->string acc ascii) size))
@@ -124,18 +124,18 @@
         chord {:intervals alterated
                :bass t.bass
                :root t.root
-               :suffix (dissoc t :root :bass)}]
+               :suffix (dissoc! t :root :bass)}]
     (setmetatable chord {:__index Chord :__tostring Chord.tostring})
     chord))
 
 (fn Chord.numeric [{: root : intervals &as t}]
-  (safe-prepend
+  (safe-prepend!
    (num-bass t)
    (totable
     (transpose (map Interval.semitones intervals) root))))
 
 (fn Chord.notes [{: intervals : root &as t} octave]
-  (safe-prepend
+  (safe-prepend!
    (bass-with-octave t octave)
    (mapv (partial Note.transpose (assoc-octave root octave)) intervals)))
 

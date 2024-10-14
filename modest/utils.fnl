@@ -35,16 +35,16 @@
   (let [index (% i (length coll))]
     (. coll (if (= index 0) (length coll) index))))
 
-(fn prepend [el t]
+(fn prepend! [el t]
   (table.insert t 1 el)
   t)
 
-(fn conj [t v]
+(fn conj! [t v]
   (table.insert t v)
   t)
 
-(fn safe-prepend [el t]
-  (if el (prepend el t) t))
+(fn safe-prepend! [el t]
+  (if el (prepend! el t) t))
 
 (fn swap [[a b]]
   [b a])
@@ -91,12 +91,12 @@
 (fn vals [m]
   (icollect [_ v (pairs m)] v))
 
-(fn dissoc [t & keys]
+(fn dissoc! [t & keys]
   (each [_ k (ipairs keys)]
     (tset t k nil))
   t)
 
-(fn assoc [t k v]
+(fn assoc! [t k v]
   (tset t k v)
   t)
 
@@ -114,8 +114,8 @@
 
 {: sort-transformed : table?
  : second : slice : index-of : dec
- : circular-index : conj
- : safe-prepend : flatten-nested : swap
+ : circular-index : conj!
+ : safe-prepend! : flatten-nested : swap
  : apply : inc : mapv : contains?
  : sum : copy : keys : vals
- : assoc : dissoc : parse : parse-if-string} 
+ : assoc! : dissoc! : parse : parse-if-string} 
