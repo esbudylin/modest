@@ -24,7 +24,6 @@ jobs:
     - name: build
       run: |
         luarocks install luaunit
-        luarocks install luafilesystem
         luarocks make rockspec/modest-harmony-scm-1.rockspec
 
     - name: test
@@ -46,7 +45,6 @@ jobs:
     - name: build
       run: |
         luarocks install luaunit
-        luarocks install luafilesystem
         luarocks make rockspec/modest-harmony-scm-1.rockspec
 
     - name: test
