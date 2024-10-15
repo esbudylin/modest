@@ -26,10 +26,8 @@
 
 ;; semitones for perfect and major intervals
 (fn base-interval [size]
-  (if (= size 1)
-      0
-      (reduce #(+ $ (circular-index Tones $2)) 0
-              (range 1 (dec size)))))
+  (faccumulate [n 0 i 1 (dec size)]
+    (+ n (circular-index Tones i))))
 
 (local Note {})
 
