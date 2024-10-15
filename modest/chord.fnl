@@ -1,5 +1,3 @@
-(local {: reduce : map : tomap : totable} (require :fun))
-
 (local {: Note : Interval : is-perfect
         : semitone-interval : grammars
         : accidental->string : assoc-octave
@@ -7,7 +5,8 @@
        (require :modest.basics))
 
 (local {: flatten-nested : sort-transformed! : safe-prepend! : parse
-        : conj! : apply : copy : mapv : vals : assoc! : dissoc!}
+        : conj! : apply : copy : vals : assoc! : dissoc!
+        : map : reduce }
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -38,18 +37,19 @@
       (if (is-perfect add)
           [add] [add :maj])))
 
+(fn index-by [coll foo]
+  (collect [_ i (ipairs coll)]
+    (foo i) i))
+
 (fn alterate [intervals {: alterations}]
   (if alterations
-      (let [interval-map
-            (tomap (map (fn [i] (values (. i :size) i)) intervals))
-            alterated-map
-            (reduce (fn [acc [alt size]]
-                      (let [quality (or (-?> interval-map (. size) (. :quality)) 0)]
-                        (assoc! acc size
-                               (Interval.new size (+ quality alt)))))
-                    interval-map
-                    alterations)]
-        (vals alterated-map))
+      (let [alt-map (collect [_ [acc interval-size] (ipairs alterations)]
+                      (values interval-size acc))
+            interval-map (index-by intervals #(. $ :size))]
+        (each [size alt (pairs alt-map)]
+          (let [{: quality} (or (. interval-map size) {})]
+            (tset interval-map size (Interval.new size (+ (or quality 0) alt)))))
+        (vals interval-map))
       intervals))
 
 (fn num-bass [{: root : bass}]
@@ -119,7 +119,7 @@
   (let [t (parse grammars.chord str)
         foos [root build-triad add-7 extend added]
         intervals (map (partial apply Interval.new)
-                       (flatten-nested (mapv #($ t) foos)))
+                       (flatten-nested (map #($ t) foos)))
         alterated (sort-transformed! (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass
@@ -131,13 +131,12 @@
 (fn Chord.numeric [{: root : intervals &as t}]
   (safe-prepend!
    (num-bass t)
-   (totable
-    (transpose (map Interval.semitones intervals) root))))
+   (transpose (map Interval.semitones intervals) root)))
 
 (fn Chord.notes [{: intervals : root &as t} octave]
   (safe-prepend!
    (bass-with-octave t octave)
-   (mapv (partial Note.transpose (assoc-octave root octave)) intervals)))
+   (map (partial Note.transpose (assoc-octave root octave)) intervals)))
 
 (fn Chord.transpose [self interval]
   (chord-transpose-util self interval 1))

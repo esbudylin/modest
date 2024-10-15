@@ -1,7 +1,7 @@
 (local {: assertEquals} (require :luaunit))
 
 (local {: Chord : Interval} (require :modest))
-(local {: mapv} (require :modest.utils))
+(local {: map} (require :modest.utils))
 
 (import-macros {: parameterized} :test-macros)
 
@@ -11,7 +11,7 @@
 ;; https://github.com/bspaans/python-mingus/blob/master/tests/unit/core/test_chords.py
 
 (fn test-notes [chord notes octave]
-  (assertEquals (mapv tostring
+  (assertEquals (map tostring
                      (-> chord Chord.fromstring (Chord.notes octave)))
                 notes
                 (.. "Mismatched notes for chord: " chord)))

@@ -2,23 +2,49 @@
 (local unpack
        (or _G.unpack table.unpack))
 
-(local {: range : map : nth : reduce : chain
-        : filter : totable : head : tail} (require :fun))
-
-(fn apply [f args]
-  (f (unpack args)))
-
-(fn second [v]
-  (. v 2))
-
-(fn table? [v]
-  (= (type v) :table))
-
 (fn inc [i]
   (+ 1 i))
 
 (fn dec [i]
   (- i 1))
+
+(fn nth [i coll]
+  (. coll i))
+
+(fn range [i j]
+  (fcollect [n i j] n))
+
+(fn apply [f args]
+  (f (unpack args)))
+
+(fn map [foo v]
+  (icollect [_ i (ipairs v)]
+    (foo i)))
+
+(fn slice [coll a b]
+  (map #(nth $ coll)
+       (range a b)))
+
+(fn filter [foo v]
+  (icollect [_ i (ipairs v)]
+    (when (foo i) i)))
+
+(fn reduce [f acc coll]
+  (accumulate [acc acc
+               _ n (ipairs coll)]
+    (f acc n)))
+
+(fn head [v]
+  (. v 1))
+
+(fn second [v]
+  (. v 2))
+
+(fn tail [v]
+  (slice 2 (length v)))
+
+(fn table? [v]
+  (= (type v) :table))
 
 (fn sum [& nums]
   (reduce #(+ $ $2) 0 nums))
@@ -26,10 +52,6 @@
 (fn sort-transformed! [coll comp]
   (table.sort coll #(< (comp $) (comp $2)))
   coll)
-
-(fn slice [coll a b]
-  (map #(nth $ coll)
-       (range a b)))
 
 (fn circular-index [coll i]
   (let [index (% i (length coll))]
@@ -55,8 +77,13 @@
 (fn nested? [v]
   (not (empty? (filter table? v))))
 
+(fn chain! [a b]
+  (each [_ el (ipairs b)]
+    (conj! a el))
+  a)
+
 (fn mapcat [f coll]
-  (reduce chain [] (map f coll)))
+  (reduce chain! [] (map f coll)))
 
 (fn flatten-nested [coll]
   (mapcat
@@ -66,17 +93,14 @@
    coll))
 
 (fn index-of [el coll]
-  (fn u [coll acc]
-    (if (empty? coll) nil
-        (= (head coll) el) acc
-        (u (tail coll) (+ acc 1))))
-  (u coll 1))
+  (fn u [pos acc]
+    (if (= (nth pos coll) nil) nil
+        (= (nth pos coll) el) acc
+        (u (inc pos) (inc acc))))
+  (u 1 1))
 
 (fn contains? [coll el]
   (not= (index-of el coll) nil))
-
-(fn mapv [foo coll]
-  (totable (map foo coll)))
 
 (fn copy [t]
   (local res {})
@@ -116,6 +140,7 @@
  : second : slice : index-of : dec
  : circular-index : conj!
  : safe-prepend! : flatten-nested : swap
- : apply : inc : mapv : contains?
+ : apply : inc : contains?
  : sum : copy : keys : vals
- : assoc! : dissoc! : parse : parse-if-string} 
+ : assoc! : dissoc! : parse : parse-if-string
+ : map : slice : range : reduce : head} 

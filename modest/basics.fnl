@@ -3,15 +3,18 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
-(local {: head : totable : reduce : range} (require :fun))
-
 (local
- {: index-of : circular-index : slice : second : swap
-  : apply : mapv : dec : contains? : sum
-  : parse : parse-if-string : dissoc! : copy}
+ {: circular-index : slice : second : swap
+  : apply : map : dec : contains? : sum
+  : parse : parse-if-string : dissoc! : copy
+  : head : reduce : range }
  (require :modest.utils))
 
-(local Octave [:C :D :E :F :G :A :B])
+(local Notes [:C :D :E :F :G :A :B])
+
+;; an associative table to look up the position of a note within the octave
+(local Octave (collect [i n (ipairs Notes)] (values n i)))
+(local octave-steps (length Notes))
 
 (local Tones [2 2 1 2 2 2 1])
 (local octave-semitones (apply sum Tones))
@@ -76,7 +79,7 @@
      (if (= 1 (% accidental 2)) single ""))))
 
 (fn find-in-octave [{: tone}]
-  (index-of tone Octave))
+  (. Octave tone))
 
 (fn assoc-octave [{: tone : accidental} octave]
   (Note.new tone accidental octave))
@@ -97,9 +100,9 @@
 
 (fn transpose-util* [{: tone : octave : accidental} {: size &as interval} direction]
   (let [target-semitones (Interval.semitones interval)
-        octave-pos (+ (index-of tone Octave) (* direction (dec size)))
-        new-tone (circular-index Octave octave-pos)
-        octave-diff (math.abs (floor-/ (dec octave-pos) (length Octave)))
+        octave-pos (+ (. Octave tone) (* direction (dec size)))
+        new-tone (circular-index Notes octave-pos)
+        octave-diff (math.abs (floor-/ (dec octave-pos) octave-steps))
         new-octave (when octave (+ octave (* direction octave-diff)))
         diff (- target-semitones
                 (semitone-interval-between-tones [tone new-tone]
@@ -126,10 +129,10 @@
     r))
 
 (fn Note.pitch_class [{: tone : accidental}]
-  (let [pos (index-of tone Octave)
+  (let [pos (. Octave tone)
         ht (if (= pos 1)
                0
-               (apply sum (totable (slice Tones 1 (dec pos)))))]
+               (apply sum (slice Tones 1 (dec pos))))]
     (% (+ accidental ht) octave-semitones)))
 
 (fn Note.transpose [self interval]
@@ -159,8 +162,8 @@
     t))
 
 (fn identify-interval [a-note b-note]
-  (let [[a-pos b-pos] (mapv find-in-octave [a-note b-note])
-        [a-int b-int] (mapv Note.pitch_class [a-note b-note])
+  (let [[a-pos b-pos] (map find-in-octave [a-note b-note])
+        [a-int b-int] (map Note.pitch_class [a-note b-note])
         diminished-octave (and (= a-pos b-pos)
                                (> a-note.accidental b-note.accidental)) ;; e.g. a-note - C; b-note - Cb
         octave-offset (if (or diminished-octave (> a-pos b-pos)) 1 0)
@@ -169,18 +172,18 @@
                      a-note.octave
                      octave-offset))
         size (if diminished-octave
-                 (+ 1 (length Octave))
-                 (+ 1 (% (- b-pos a-pos) (length Octave))))
+                 (+ 1 octave-steps)
+                 (+ 1 (% (- b-pos a-pos) octave-steps)))
         interval-ht (% (- b-int a-int) octave-semitones)
         base-ht (base-interval size)]
     (Interval.new
-     (+ size (if octaves (* octaves (length Octave)) 0))
+     (+ size (if octaves (* octaves octave-steps) 0))
      (- interval-ht base-ht))))
 
 ;; unlike identify-interval, this method can accept strings as arguments
 (fn Interval.identify [& args]
   (apply identify-interval
-         (mapv
+         (map
           (partial parse-if-string grammars.note)
           args)))
 
