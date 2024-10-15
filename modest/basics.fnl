@@ -7,9 +7,16 @@
 (macro ensure [cond message]
   `(when (not ,cond) (error ,message)))
 
+;; macro for checking if an element exists in a table known at compile-time 
+(macro contains-at-compile? [tbl el]
+  (let [unpack (or table.unpack _G.unpack)]
+    `(let [el# ,el]
+       (or ,(unpack (icollect [_ i (ipairs tbl)]
+                       `(= ,i el#)))))))
+
 (local
  {: circular-index : slice : second : swap
-  : apply : map : dec : contains? : sum
+  : apply : map : dec : sum
   : parse : parse-if-string : dissoc! : copy
   : head : reduce : range }
  (require :modest.utils))
@@ -23,9 +30,8 @@
 (local Tones [2 2 1 2 2 2 1])
 (local octave-semitones (apply sum Tones))
 
-(local Perfect-Intervals [1 4 5])
 (fn is-perfect [size]
-  (contains? Perfect-Intervals (% size 7)))
+  (contains-at-compile? [1 4 5] (% size 7)))
 
 ;; luajit support
 (fn floor-/ [a b]
@@ -66,7 +72,7 @@
      (Note.new b-tone 0 octave-diff))))
 
 (fn is-valid-interval [size quality]
-  (and (or (and (is-perfect size) (not (contains? [:min :maj] quality)))
+  (and (or (and (is-perfect size) (not (contains-at-compile? [:min :maj] quality)))
            (and (not (is-perfect size)) (not= quality :perfect)))
        (not (and (= size 1) (= quality :dim)))))
 
@@ -122,8 +128,8 @@
 
 (fn Note.new [tone acc octave]
   (ensure (= (type tone) :string) "Invalid argument")
-  (ensure (contains? [:number :nil] (type acc)) "Invalid argument")
-  (ensure (contains? [:number :nil] (type octave)) "Invalid argument")
+  (ensure (contains-at-compile? [:number :nil] (type acc)) "Invalid argument")
+  (ensure (contains-at-compile? [:number :nil] (type octave)) "Invalid argument")
   (ensure (or (not octave) (>= octave 0))
           (.. "Octave must be a positive number or zero. Octave: " octave))
   (let [r {:tone tone
@@ -159,7 +165,9 @@
           :number ?quality
           :string (do (ensure (is-valid-interval size ?quality) "Invalid combination of size and quality")
                       (quality->int size ?quality))
-          :nil (if (is-perfect size) 0 (error "Interval quality is undefined")))]
+          :nil (do (ensure (is-perfect size) "Interval quality is undefined")
+                   0)
+          _ (error (.. "Invalid argument for quality " ?quality)))]
     (ensure (> size 0) (.. "Size of interval must be a positive integer. Size " size))
     (local t {: size : quality})
     (setmetatable t Interval.mt)
