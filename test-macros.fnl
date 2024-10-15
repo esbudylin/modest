@@ -1,3 +1,6 @@
+;; Any copyright is dedicated to the Public Domain.
+;; https://creativecommons.org/publicdomain/zero/1.0/
+
 (fn parameterized [name params func]
   (icollect [i p (ipairs params)]
     `(let [fennel# (require :fennel)

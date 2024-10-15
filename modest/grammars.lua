@@ -1,3 +1,9 @@
+--[[
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
 local lp = require "lpeg"
 
 local S, R, P, V, C, Ct, Cc, Cg, utfR = lp.S, lp.R, lp.P, lp.V, lp.C, lp.Ct, lp.Cc, lp.Cg, lp.utfR
