@@ -6,7 +6,7 @@
 
 (local {: flatten-nested : sort-transformed! : safe-prepend! : parse
         : conj! : apply : copy : vals : assoc! : dissoc!
-        : map : reduce }
+        : map : reduce : map-into-kv }
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -37,19 +37,22 @@
       (if (is-perfect add)
           [add] [add :maj])))
 
-(fn index-by [coll foo]
-  (collect [_ i (ipairs coll)]
-    (foo i) i))
-
 (fn alterate [intervals {: alterations}]
   (if alterations
-      (let [alt-map (collect [_ [acc interval-size] (ipairs alterations)]
-                      (values interval-size acc))
-            interval-map (index-by intervals #(. $ :size))]
-        (each [size alt (pairs alt-map)]
-          (let [{: quality} (or (. interval-map size) {})]
-            (tset interval-map size (Interval.new size (+ (or quality 0) alt)))))
-        (vals interval-map))
+      (let [interval-map
+            (map-into-kv (fn [i] (values (. i :size) i))
+                         intervals)
+            alterated-map
+            (reduce (fn [acc [alt size]]
+                         (let [quality
+                               (or (-?> interval-map (. size) (. :quality))
+                                   0)]
+                           (assoc! acc
+                                   size
+                                   (Interval.new size (+ quality alt)))))
+                       interval-map
+                       alterations)]
+        (vals alterated-map))
       intervals))
 
 (fn num-bass [{: root : bass}]

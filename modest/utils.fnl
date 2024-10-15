@@ -21,6 +21,11 @@
   (icollect [_ i (ipairs v)]
     (foo i)))
 
+;; map into associative table
+(fn map-into-kv [foo v]
+  (collect [_ i (ipairs v)]
+    (foo i)))
+
 (fn slice [coll a b]
   (map #(nth $ coll)
        (range a b)))
@@ -140,7 +145,7 @@
  : second : slice : index-of : dec
  : circular-index : conj!
  : safe-prepend! : flatten-nested : swap
- : apply : inc : contains?
+ : apply : inc : contains? : map-into-kv
  : sum : copy : keys : vals
  : assoc! : dissoc! : parse : parse-if-string
  : map : slice : range : reduce : head} 
