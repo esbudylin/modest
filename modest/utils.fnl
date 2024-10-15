@@ -23,7 +23,7 @@
 (fn sum [& nums]
   (reduce #(+ $ $2) 0 nums))
 
-(fn sort-transformed [coll comp]
+(fn sort-transformed! [coll comp]
   (table.sort coll #(< (comp $) (comp $2)))
   coll)
 
@@ -112,7 +112,7 @@
       (parse grammar n)
       n))
 
-{: sort-transformed : table?
+{: sort-transformed! : table?
  : second : slice : index-of : dec
  : circular-index : conj!
  : safe-prepend! : flatten-nested : swap

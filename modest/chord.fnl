@@ -6,7 +6,7 @@
         : transpose-util}
        (require :modest.basics))
 
-(local {: flatten-nested : sort-transformed : safe-prepend! : parse
+(local {: flatten-nested : sort-transformed! : safe-prepend! : parse
         : conj! : apply : copy : mapv : vals : assoc! : dissoc!}
        (require :modest.utils))
 
@@ -86,7 +86,7 @@
   (let [alterations (-> (or alterations [])
                         (copy)
                         (conj! (when (= triad :half-dim) [-1 5]))
-                        (sort-transformed #(. $ 2)))
+                        (sort-transformed! #(. $ 2)))
         alteration-string (reduce (fn [res [acc size]]
                                     (.. res (accidental->string acc ascii) size))
                                   "" alterations)]
@@ -120,7 +120,7 @@
         foos [root build-triad add-7 extend added]
         intervals (map (partial apply Interval.new)
                        (flatten-nested (mapv #($ t) foos)))
-        alterated (sort-transformed (alterate intervals t) Interval.semitones)
+        alterated (sort-transformed! (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass
                :root t.root
