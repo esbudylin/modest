@@ -1,9 +1,16 @@
-(local {: Note : Interval : is-perfect : semitone-interval
-         : accidental-to-string : assoc-octave : transpose-util}
+;; This Source Code Form is subject to the terms of the Mozilla Public
+;; License, v. 2.0. If a copy of the MPL was not distributed with this
+;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+(local {: Note : Interval : is-perfect
+        : semitone-interval : grammars
+        : accidental->string : assoc-octave
+        : transpose-util}
        (require :modest.basics))
 
-(local {: map : flatten-nested : sort : apply : safe-cons
-         : index-by : vals : remove-keys : copy : conj : reduce}
+(local {: flatten-nested : sort-transformed! : safe-prepend! : parse
+        : conj! : apply : copy : vals : assoc! : dissoc!
+        : map : reduce : map-into-kv }
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -36,13 +43,20 @@
 
 (fn alterate [intervals {: alterations}]
   (if alterations
-      (let [alt-map (collect [_ [acc interval-size] (ipairs alterations)]
-                      (values interval-size acc))
-            interval-map (index-by intervals #(. $ :size))]
-        (each [size alt (pairs alt-map)]
-          (let [{: quality} (or (. interval-map size) {})]
-            (tset interval-map size (Interval.new size (+ (or quality 0) alt)))))
-        (vals interval-map))
+      (let [interval-map
+            (map-into-kv (fn [i] (values (. i :size) i))
+                         intervals)
+            alterated-map
+            (reduce (fn [acc [alt size]]
+                         (let [quality
+                               (or (-?> interval-map (. size) (. :quality))
+                                   0)]
+                           (assoc! acc
+                                   size
+                                   (Interval.new size (+ quality alt)))))
+                       interval-map
+                       alterations)]
+        (vals alterated-map))
       intervals))
 
 (fn num-bass [{: root : bass}]
@@ -62,7 +76,7 @@
         (assoc-octave bass bass-octave))
       bass))
 
-(fn quality-to-string [{: triad}]
+(fn quality->string [{: triad}]
   (case triad
     :min :m
     :power :5
@@ -71,32 +85,32 @@
     (where (or :maj :half-dim)) ""
     _ triad))
 
-(fn ext-to-string [{: maj_ext : ext}]
+(fn ext->string [{: maj_ext : ext}]
   (when ext
       (.. (if maj_ext "M" "") ext)))
 
-(fn alterations-to-string [{: alterations : triad} ascii]
+(fn alterations->string [{: alterations : triad} ascii]
   (let [alterations (-> (or alterations [])
                         (copy)
-                        (conj (when (= triad :half-dim) [-1 5]))
-                        (sort #(. $ 2)))
-        alteration-string (accumulate [res ""
-                                       _ [acc interval-size] (ipairs alterations)]
-                            (.. res (accidental-to-string acc ascii) interval-size))]
+                        (conj! (when (= triad :half-dim) [-1 5]))
+                        (sort-transformed! #(. $ 2)))
+        alteration-string (reduce (fn [res [acc size]]
+                                    (.. res (accidental->string acc ascii) size))
+                                  "" alterations)]
     (if (= alteration-string "")
       alteration-string
       (.. "(" alteration-string ")"))))
 
-(fn add-to-string [{: add : ext}]
+(fn add->string [{: add : ext}]
   (when add
     (.. (if (= ext 6) "/" "") add)))
 
 ;; transforms a parsed chord suffix (e.g. mM7, aug, dim7) into a string
-(fn suffix-to-string [suffix ascii]
-  (let [foos [quality-to-string ext-to-string
-              add-to-string #(alterations-to-string $ ascii)]
+(fn suffix->string [suffix ascii]
+  (let [foos [quality->string ext->string
+              add->string #(alterations->string $ ascii)]
         strings (map #($ suffix) foos)]
-    (reduce #(.. $ $2) strings "")))
+    (reduce #(.. $ (or $2 "")) "" strings)))
 
 (local Chord {})
 
@@ -105,16 +119,31 @@
                : suffix
                :bass (when bass (transpose-util bass interval dir))
                :root (transpose-util root interval dir)}]
-    (setmetatable chord {:__index Chord :__tostring Chord.tostring})
+    (setmetatable chord Chord.mt)
+    chord))
+
+(fn Chord.fromstring [str]
+  (let [t (parse grammars.chord str)
+        foos [root build-triad add-7 extend added]
+        intervals (map (partial apply Interval.new)
+                       (flatten-nested (map #($ t) foos)))
+        alterated (sort-transformed! (alterate intervals t) Interval.semitones)
+        chord {:intervals alterated
+               :bass t.bass
+               :root t.root
+               :suffix (dissoc! t :root :bass)}]
+    (setmetatable chord Chord.mt)
     chord))
 
 (fn Chord.numeric [{: root : intervals &as t}]
-  (safe-cons (num-bass t)
-             (transpose (map Interval.semitones intervals) root)))
+  (safe-prepend!
+   (num-bass t)
+   (transpose (map Interval.semitones intervals) root)))
 
 (fn Chord.notes [{: intervals : root &as t} octave]
-  (safe-cons (bass-with-octave t octave)
-             (map (partial Note.transpose (assoc-octave root octave)) intervals)))
+  (safe-prepend!
+   (bass-with-octave t octave)
+   (map (partial Note.transpose (assoc-octave root octave)) intervals)))
 
 (fn Chord.transpose [self interval]
   (chord-transpose-util self interval 1))
@@ -123,23 +152,14 @@
   (chord-transpose-util self interval -1))
 
 (fn Chord.tostring [{: root : bass : suffix} ascii]
-  (local str-func #(Note.tostring $ ascii))
-  (.. (str-func root)
-      (suffix-to-string suffix ascii)
-      (if bass (.. "/" (str-func bass)) "")))
+  (let [str-func #(Note.tostring $ ascii)]
+    (.. (str-func root)
+        (suffix->string suffix ascii)
+        (if bass (.. "/" (str-func bass)) ""))))
 
 (fn Chord.toascii [self] (Chord.tostring self true))
 
-(fn Chord.transform [t]
-  (let [foos [root build-triad add-7 extend added]
-        intervals (map (partial apply Interval.new)
-                       (flatten-nested (map #($ t) foos)))
-        alterated (sort (alterate intervals t) Interval.semitones)
-        chord {:intervals alterated
-               :bass t.bass
-               :root t.root
-               :suffix (remove-keys t :root :bass)}]
-    (setmetatable chord {:__index Chord :__tostring Chord.tostring})
-    chord))
+(set Chord.mt {:__index (dissoc! (copy Chord) :fromstring :mt)
+               :__tostring Chord.tostring})
 
 Chord

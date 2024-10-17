@@ -1,14 +1,21 @@
+;; Any copyright is dedicated to the Public Domain.
+;; https://creativecommons.org/publicdomain/zero/1.0/
+
 ;; luajit support
 (local unpack
        (or _G.unpack table.unpack))
 
-(macro let-default [bindings & body]
-  (let [tbl (icollect [i b (ipairs bindings)]
-              (if (~= 0 (% i 2))
-                  b
-                  (let [val (. bindings (- i 1))]
-                    `(if (= ,val nil) ,b ,val))))]
-    `(let ,tbl ,(unpack body))))
+(fn inc [i]
+  (+ 1 i))
+
+(fn dec [i]
+  (- i 1))
+
+(fn nth [i coll]
+  (. coll i))
+
+(fn range [i j]
+  (fcollect [n i j] n))
 
 (fn apply [f args]
   (f (unpack args)))
@@ -17,127 +24,91 @@
   (icollect [_ i (ipairs v)]
     (foo i)))
 
+;; map into associative table
+(fn map-into-kv [foo v]
+  (collect [_ i (ipairs v)]
+    (foo i)))
+
+(fn slice [coll a b]
+  (map #(nth $ coll)
+       (range a b)))
+
 (fn filter [foo v]
   (icollect [_ i (ipairs v)]
     (when (foo i) i)))
 
-(fn range [i]
-  (fcollect [j 1 i] j))
+(fn reduce [f acc coll]
+  (accumulate [acc acc
+               _ n (ipairs coll)]
+    (f acc n)))
 
-(fn keys [m]
-  (icollect [k _ (pairs m)] k))
-
-(fn vals [m]
-  (icollect [_ v (pairs m)] v))
-
-(fn car [v]
+(fn head [v]
   (. v 1))
 
 (fn second [v]
   (. v 2))
 
-(fn cdr [v]
-  [(unpack v 2)])
-
-(fn last [v]
-  (. v (length v)))
-
-(fn cons [a v]
-  [a (unpack v)])
-
-(fn conj [t v]
-  (table.insert t v)
-  t)
-
-(fn concat [v1 v2]
-  (each [_ e (ipairs v2)]
-    (table.insert v1 e))
-  v1)
-
-(fn empty? [v]
-  (= (next v) nil))
+(fn tail [v]
+  (slice 2 (length v)))
 
 (fn table? [v]
   (= (type v) :table))
 
-(fn find [coll el acc]
-  (let-default [acc 1]
-   (if (empty? coll) nil
-       (= (car coll) el) acc
-       (find (cdr coll) el (+ acc 1)))))
-
-(fn contains? [coll el]
-  (not= (find coll el) nil))
-
-(fn sort [coll comp]
-  (table.sort coll (when comp #(< (comp $) (comp $2))))
-  coll)
-
-(fn flatten [v fcond acc]
-  (let-default [acc [] fcond (fn [] true)]
-   (if (empty? v) acc
-       (and (table? (car v)) (fcond (car v)))
-       (flatten (cdr v)
-                fcond
-                (concat acc (flatten (car v) fcond)))
-       (flatten (cdr v)
-                fcond
-                (conj acc (car v))))))
-
-(fn nested? [v]
-  (not (empty? (filter table? v))))
-
-(fn flatten-nested [lol]
-  (flatten lol nested?))
-
-(fn circular [t]
-  (local n (length t))
-  (var i 0)
-  (fn []
-    (set i (+ i 1))
-    (let [pos (% i n)]
-      (values i (. t (if (= pos 0) n pos))))))
-
-(fn reduce [f coll acc]
-  (if
-   (empty? coll) acc
-   (= acc nil) (reduce f (cdr coll) (car coll))
-   (reduce f (cdr coll) (f acc (car coll)))))
-
-(fn comp [& fs]
-  (reduce
-   (fn [f g]
-     (fn [& args] (f (apply g args))))
-   fs))
-
-(fn sum-tables [a b]
-  (local res {})
-  (each [k v (pairs b)]
-    (tset res k (+ v (. a k))))
-  res)
-
-(fn slice [coll a b]
-  [(unpack coll a b)])
-
 (fn sum [& nums]
-  (accumulate [acc 0 _ n (ipairs nums)]
-    (+ acc n)))
+  (reduce #(+ $ $2) 0 nums))
+
+(fn sort-transformed! [coll comp]
+  (table.sort coll #(< (comp $) (comp $2)))
+  coll)
 
 (fn circular-index [coll i]
   (let [index (% i (length coll))]
     (. coll (if (= index 0) (length coll) index))))
 
-(fn index-by [coll foo]
-  (collect [_ i (ipairs coll)]
-    (foo i) i))
-
-(fn safe-cons [el l]
-  (if el (cons el l) l))
-
-(fn remove-keys [t & keys]
-  (each [_ k (ipairs keys)]
-    (tset t k nil))
+(fn prepend! [el t]
+  (table.insert t 1 el)
   t)
+
+(fn conj! [t v]
+  (table.insert t v)
+  t)
+
+(fn safe-prepend! [el t]
+  (if el (prepend! el t) t))
+
+(fn swap [[a b]]
+  [b a])
+
+(fn empty? [coll]
+  (= (nth 1 coll) nil))
+
+(fn nested? [v]
+  (not (empty? (filter table? v))))
+
+(fn chain! [a b]
+  (each [_ el (ipairs b)]
+    (conj! a el))
+  a)
+
+(fn mapcat [f coll]
+  (reduce chain! [] (map f coll)))
+
+(fn flatten-nested [coll]
+  (mapcat
+   (fn [x]
+     (if (nested? x)        
+         x [x]))
+   coll))
+
+(fn index-of [el coll]
+  (fn u [pos acc]
+    (if (= (nth pos coll) nil) nil
+        (= (nth pos coll) el) acc
+        (u (inc pos) (inc acc))))
+  (u 1 1))
+
+(fn contains? [coll el]
+  (not= (index-of el coll) nil))
 
 (fn copy [t]
   (local res {})
@@ -146,15 +117,38 @@
           (if (= (type v) :table) (copy v) v)))
   res)
 
-(fn swap [[a b]]
-  [b a])
+(fn keys [m]
+  (icollect [k _ (pairs m)] k))
 
-{: map : cons : conj : concat
- : flatten : car : cdr : contains?
- : sort : empty? : table? : filter
- : range : second : circular : find
- : comp : reduce : apply : last : slice
- : sum : circular-index : flatten-nested
- : keys : vals : sum-tables : index-by
- : safe-cons : remove-keys : copy
- : swap}
+(fn vals [m]
+  (icollect [_ v (pairs m)] v))
+
+(fn dissoc! [t & keys]
+  (each [_ k (ipairs keys)]
+    (tset t k nil))
+  t)
+
+(fn assoc! [t k v]
+  (tset t k v)
+  t)
+
+(fn parse [grammar str]
+  (or (grammar:match str)
+      (error (.. "Can't parse: " str))))
+
+(fn string? [str]
+  (= (type str) :string))
+
+(fn parse-if-string [grammar n]
+  (if (string? n)
+      (parse grammar n)
+      n))
+
+{: sort-transformed! : table?
+ : second : slice : index-of : dec
+ : circular-index : conj!
+ : safe-prepend! : flatten-nested : swap
+ : apply : inc : contains? : map-into-kv
+ : sum : copy : keys : vals
+ : assoc! : dissoc! : parse : parse-if-string
+ : map : slice : range : reduce : head} 
