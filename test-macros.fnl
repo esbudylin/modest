@@ -1,3 +1,5 @@
+;; fennel-ls: macro-file
+
 ;; Any copyright is dedicated to the Public Domain.
 ;; https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -7,7 +9,7 @@
            unpack# (or _G.unpack table.unpack)
            param-view# (fennel#.view ,p)
            foo# (fn []
-                  (match (pcall #(,func (unpack# ,p)))
+                  (case (pcall #(,func (unpack# ,p)))
                     (where (_# err#) (not= err# nil))
                     (error (.. err#
                                "\n"
