@@ -18,7 +18,7 @@
  {: circular-index : slice : second : swap
   : apply : map : dec : sum
   : parse : parse-if-string : dissoc! : copy
-  : head : reduce : range }
+  : head }
  (require :modest.utils))
 
 (local Notes [:C :D :E :F :G :A :B])
