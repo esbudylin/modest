@@ -48,9 +48,6 @@
 (fn second [v]
   (. v 2))
 
-(fn tail [v]
-  (slice 2 (length v)))
-
 (fn table? [v]
   (= (type v) :table))
 
@@ -104,7 +101,7 @@
   (local res {})
   (each [k v (pairs t)]
     (tset res k
-          (if (= (type v) :table) (copy v) v)))
+          (if (table? v) (copy v) v)))
   res)
 
 (fn keys [m]
