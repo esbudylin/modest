@@ -100,16 +100,6 @@
          x [x]))
    coll))
 
-(fn index-of [el coll]
-  (fn u [pos acc]
-    (if (= (nth pos coll) nil) nil
-        (= (nth pos coll) el) acc
-        (u (inc pos) (inc acc))))
-  (u 1 1))
-
-(fn contains? [coll el]
-  (not= (index-of el coll) nil))
-
 (fn copy [t]
   (local res {})
   (each [k v (pairs t)]
@@ -145,10 +135,10 @@
       n))
 
 {: sort-transformed! : table?
- : second : slice : index-of : dec
+ : second : slice : dec
  : circular-index : conj!
  : safe-prepend! : flatten-nested : swap
- : apply : inc : contains? : map-into-kv
+ : apply : inc : map-into-kv
  : sum : copy : keys : vals
  : assoc! : dissoc! : parse : parse-if-string
  : map : slice : range : reduce : head} 
