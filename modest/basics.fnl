@@ -53,7 +53,7 @@
   (Interval.new size quality))
 
 (fn accidental->semitones [accidental]
-  (match accidental
+  (case accidental
     :flat -1
     :sharp 1
     :double-flat -2

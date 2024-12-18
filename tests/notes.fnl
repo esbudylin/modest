@@ -17,3 +17,11 @@
                (fn [note integer]
                  (assertEquals (note:pitch_class) integer)))
 
+(parameterized :parse_notes
+               [["D♯4" (Note.new :D 1 4)]
+                ["E♭3" (Note.new :E -1 3)]
+                ["C1" (Note.new :C 0 1)]
+                ["G𝄫" (Note.new :G -2)]
+                ["B𝄪" (Note.new :B 2)]]
+               (fn [str note]
+                 (assertEquals (Note.fromstring str) note)))
