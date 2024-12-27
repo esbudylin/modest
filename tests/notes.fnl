@@ -22,6 +22,8 @@
                 ["E♭3" (Note.new :E -1 3)]
                 ["C1" (Note.new :C 0 1)]
                 ["G𝄫" (Note.new :G -2)]
-                ["B𝄪" (Note.new :B 2)]]
+                ["B𝄪" (Note.new :B 2)]
+                ["Dbb" (Note.new :D -2)]
+                ["Gx" (Note.new :G 2)]]
                (fn [str note]
                  (assertEquals (Note.fromstring str) note)))
