@@ -28,11 +28,11 @@
 
     quality <- min_maj_quality /
                {:triad: maj :} maj_ext_capture &seventh / -- maj can notate major 7
-               {:triad: maj / min / '' -> 'maj' :}
+               {:triad: min / maj / '' -> 'maj' :}
 
     maj <- ('maj' / 'ma' / 'Maj' / 'M' / triangle) -> 'maj'
     triangle <- '∆' / '∆' / 'Δ'
-    min <- ('min' / 'mi' / [m-]) -> 'min'
+    min <- ('min' / 'mi' / 'm' !'aj' / '-') -> 'min'
 
     min_maj_quality <- {:triad: min_maj :} maj_ext_capture
     maj_ext_capture <- {:maj_ext: '' -> totrue:}

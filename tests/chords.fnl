@@ -119,7 +119,8 @@
                 [:C7add13 [:C :E :G "B♭" :A]]
                 [:C9add11 [:C :E :G "B♭" :D :F]]
                 [:C9add13 [:C :E :G "B♭" :D :A]]
-                [:C11add13 [:C :E :G "B♭" :D :F :A]]]
+                [:C11add13 [:C :E :G "B♭" :D :F :A]]
+                [:Cmadd9 [:C "E♭" :G :D]]]
                test-notes)
 
 (parameterized :chords_not_in_c
