@@ -22,6 +22,6 @@ build = {
       ["modest.utils"] = "modest/utils.fnl",
       ["modest.basics"] = "modest/basics.fnl",
       ["modest.chord"] = "modest/chord.fnl",
-      ["modest.grammars"] = "modest/grammars.lua"
+      ["modest.grammars"] = "modest/grammars.fnl"
    },
 }
