@@ -46,8 +46,6 @@
 
 (local Interval {})
 
-(var grammars nil)
-
 (fn note-fromtable [t]
   (apply Note.new t))
 
@@ -60,6 +58,9 @@
     :sharp 1
     :double-flat -2
     :double-sharp 2))
+
+(local grammars ((require :modest.grammars)
+               note-fromtable interval-fromtable accidental->semitones))
 
 (fn semitone-interval [a b]
   (Interval.semitones (Interval.identify a b)))
@@ -218,9 +219,6 @@
 (set Interval.mt {:__index (dissoc! (copy Interval)
                                     :new :identify :fromstring :mt)
                   :__tostring Interval.tostring})
-
-(set grammars ((require :modest.grammars)
-               note-fromtable interval-fromtable accidental->semitones))
 
 {: Interval : Note : is-perfect : semitone-interval : accidental->string
  : assoc-octave : transpose-util : grammars}
