@@ -72,9 +72,10 @@
      (Note.new b-tone 0 octave-diff))))
 
 (fn is-valid-interval [size quality]
-  (and (or (and (is-perfect size) (not (contains-at-compile? [:min :maj] quality)))
-           (and (not (is-perfect size)) (not= quality :perfect)))
-       (not (and (= size 1) (= quality :dim)))))
+  (if (is-perfect size)
+      (not (or (contains-at-compile? [:min :maj] quality)
+               (and (= size 1) (= quality :dim))))
+      (not= quality :perfect)))
 
 (local ascii-acc [[:b :bb] [:# :x]])
 (local utf8-acc [["♭" "𝄫"] ["♯" "𝄪"]])
@@ -159,7 +160,7 @@
 (fn Note.toascii [note]
   (Note.tostring note true))
 
-(lambda Interval.new [size ?quality]
+(λ Interval.new [size ?quality]
   (let [quality
         (case (type ?quality)
           :number ?quality
