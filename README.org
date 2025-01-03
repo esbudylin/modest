@@ -1,4 +1,5 @@
 #+OPTIONS: ^:nil
+#+OPTIONS: H:4
 
 * Modest
 Musical harmony library for Lua.
@@ -55,9 +56,7 @@ After running the command, move the resulting modest.lua file into your project 
    
 ** Documentation
 *** Chord
-**** Methods
-
-- fromstring(string) -> Chord
+**** fromstring(string) -> Chord
   - Parses a string and returns a Chord object.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -68,7 +67,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : CM7
 
-- transpose(self, interval) -> Chord
+**** transpose(self, interval) -> Chord
   - Returns a new Chord transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -79,7 +78,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : E♭6/9
 
-- transpose_down(self, interval) -> Chord
+**** transpose_down(self, interval) -> Chord
   - Similar to transpose, returns a chord transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -90,7 +89,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : D♭9
 
-- notes(self, octave=nil) -> [Note]
+**** notes(self, octave=nil) -> [Note]
   - Returns the notes that make up the chord. Optionally, specify the octave of the root note.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -103,7 +102,7 @@ After running the command, move the resulting modest.lua file into your project 
     : A♯4
     : C♯5
 
-- numeric(self) -> [int]
+**** numeric(self) -> [int]
   - Converts the chord into a numeric representation, with each note represented as the number of semitones from the C of the chord's root octave.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -122,7 +121,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : 7, 11, 14, 17, 21
 
-- tostring(self, ascii=nil) -> string
+**** tostring(self, ascii=nil) -> string
   - Converts the chord into a string. By default accidental will be represented with special Unicode characters. Pass a true value as a parameter to get an ASCII representation.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -135,7 +134,7 @@ After running the command, move the resulting modest.lua file into your project 
     : C♯M7
     : C#M7
 
-- toascii(self) -> string
+**** toascii(self) -> string
   - Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -147,9 +146,7 @@ After running the command, move the resulting modest.lua file into your project 
     : G7(#11)
 
 *** Interval
-**** Methods
-
-- fromstring(string) -> Interval
+**** fromstring(string) -> Interval
   - Parses a string and returns an Interval object. Examples: 
     - "m3" = minor third
     - "P4" = perfect fourth
@@ -165,7 +162,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : P4
 
-- new(size, quality="perfect") -> Note
+**** new(size, quality="perfect") -> Note
   - Creates a new Interval object. Size should be an integer, and quality should be a string (valid options are "dim", "aug", "min", "maj", "perfect"). The method raises an error if the interval is invalid.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -200,7 +197,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : /usr/local/share/lua/5.4/modest/basics.lua:134: Invalid combination of size and quality
 
-- identify(note1, note2) -> Interval
+**** identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -211,7 +208,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : P4
 
-- semitones(self) -> int
+**** semitones(self) -> int
   - Returns the number of semitones in the interval.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -222,7 +219,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : 4
 
-- tostring(self) -> string
+**** tostring(self) -> string
   - Converts the interval into a string representation.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -234,9 +231,7 @@ After running the command, move the resulting modest.lua file into your project 
     : m6
 
 *** Note
-**** Methods
-
-- fromstring(string) -> Note
+**** fromstring(string) -> Note
   - Parses a string and returns a Note object.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -255,7 +250,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : E
 
-- new(tone, accidental=0, octave=nil) -> Note
+**** new(tone, accidental=0, octave=nil) -> Note
   - Creates a new Note object. The tone should be a capital letter (e.g., "C"). The accidental should be a numeric value (e.g., -1 for flat, 1 for sharp). The octave is optional.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -274,7 +269,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : B𝄫
 
-- transpose(self, interval) -> Note
+**** transpose(self, interval) -> Note
   - Returns a new note transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -285,7 +280,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : F4
 
-- transpose_down(self, interval) -> Note
+**** transpose_down(self, interval) -> Note
   - Returns a new note transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -296,7 +291,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : A3
 
-- pitch_class(self) -> int
+**** pitch_class(self) -> int
   - Returns a number from 0 to 11 representing the pitch class of the note (e.g., C=0, C♯/D♭=1, ..., B=11).
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
@@ -307,8 +302,8 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
     : 7
 
-- tostring(self, ascii) -> string
-- toascii(self) -> string
+**** tostring(self, ascii) -> string
+**** toascii(self) -> string
   - Works similarly to the Chord methods of the same name.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
