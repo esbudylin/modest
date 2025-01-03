@@ -3,17 +3,27 @@
 * Modest
 Musical harmony library for Lua.
 
-** Installation
-The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
-
-#+begin_src sh
-luarocks install modest-harmony
-#+end_src
-
 ** Features
 - Chord Object. Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
 - Note Object. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
 - Interval Object. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
+
+** Installation
+The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
+
+#+begin_src sh
+  luarocks install modest-harmony
+#+end_src
+
+*** Manual installation
+
+If you want to avoid LuaRocks, you should consider two things about the project. First, Modest depends on [[https://www.inf.puc-rio.br/~roberto/lpeg/][LPeg]], a library partially written in C, which you will need to install manually. Second, the project is written in Fennel, a language that transpiles to Lua. To use Modest in your Lua code, you can either embed Fennel compiler in your project or perform ahead-of-time compilation of the Fennel files. I recommend the latter option. To do so, [[https://fennel-lang.org/setup#downloading-fennel][install Fennel]] and run the following command from the project's root directory:
+
+#+begin_src sh
+  fennel --require-as-include --skip-include re,lpeg --compile modest/init.fnl > modest.lua
+#+end_src
+
+After running the command, move the resulting modest.lua file into your project and require it as you would any other Lua module.
 
 ** General Information
 *** Lua version support
@@ -39,6 +49,9 @@ luarocks install modest-harmony
 
 *** Metamethods
 - Each object implements '__tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
+
+*** Trivia
+- Modest is named after Modest Petrovich Mussorgsky, the great Russian composer.
    
 ** Documentation
 *** Chord
