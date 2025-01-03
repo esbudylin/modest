@@ -1,5 +1,6 @@
 #+OPTIONS: ^:nil
 #+OPTIONS: H:4
+#+OPTIONS: toc:nil
 
 * Modest
 Musical harmony library for Lua.
@@ -52,9 +53,10 @@ After running the command, move the resulting modest.lua file into your project 
 - Each object implements '__tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
 
 *** Trivia
-- Modest is named after Modest Petrovich Mussorgsky, the great Russian composer.
+- Modest is named after Modest Petrovich Mussorgsky.
    
 ** Documentation
+#+TOC: headlines 4 local
 *** Chord
 **** fromstring(string) -> Chord
   - Parses a string and returns a Chord object.

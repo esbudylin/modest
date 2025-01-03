@@ -1,49 +1,7 @@
-- [Modest](#orgfe4d01f)
-  - [Features](#orgdcabe4e)
-  - [Installation](#org9f368be)
-    - [Manual installation](#orga603833)
-  - [General Information](#org8f92e48)
-    - [Lua version support](#org4612bd8)
-    - [Immutability](#org59a9288)
-    - [String parsing](#orgcd30050)
-    - [Representation of accidentals](#orgc536892)
-    - [Metamethods](#orgdc3d4ab)
-    - [Trivia](#orgae28a4d)
-  - [Documentation](#orgeb25a0e)
-    - [Chord](#org27a928f)
-      - [fromstring(string) -> Chord](#orga798d05)
-      - [transpose(self, interval) -> Chord](#org50e334b)
-      - [transpose\_down(self, interval) -> Chord](#orgae83427)
-      - [notes(self, octave=nil) -> [Note]](#org77f8761)
-      - [numeric(self) -> [int]](#org6abf114)
-      - [tostring(self, ascii=nil) -> string](#orgc3c98b6)
-      - [toascii(self) -> string](#orga2c8049)
-    - [Interval](#orged339ef)
-      - [fromstring(string) -> Interval](#orgb783526)
-      - [new(size, quality="perfect") -> Note](#orga58d9ea)
-      - [identify(note1, note2) -> Interval](#orgbaa3a37)
-      - [semitones(self) -> int](#org981c0f4)
-      - [tostring(self) -> string](#org05d4e63)
-    - [Note](#orge532c5e)
-      - [fromstring(string) -> Note](#org3698d18)
-      - [new(tone, accidental=0, octave=nil) -> Note](#org15b0881)
-      - [transpose(self, interval) -> Note](#org76e5ba6)
-      - [transpose\_down(self, interval) -> Note](#orga6697c3)
-      - [pitch\_class(self) -> int](#orgac90010)
-      - [tostring(self, ascii) -> string](#org43b6281)
-      - [toascii(self) -> string](#orgf332bb2)
-  - [Similar libraries in other languages](#org799c25f)
-
-
-
-<a id="orgfe4d01f"></a>
-
 # Modest
 
 Musical harmony library for Lua.
 
-
-<a id="orgdcabe4e"></a>
 
 ## Features
 
@@ -51,8 +9,6 @@ Musical harmony library for Lua.
 -   Note Object. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
 -   Interval Object. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
 
-
-<a id="org9f368be"></a>
 
 ## Installation
 
@@ -62,8 +18,6 @@ The easiest way to install Modest is via [LuaRocks](https://luarocks.org/).
 luarocks install modest-harmony
 ```
 
-
-<a id="orga603833"></a>
 
 ### Manual installation
 
@@ -76,26 +30,18 @@ fennel --require-as-include --skip-include re,lpeg --compile modest/init.fnl > m
 After running the command, move the resulting modest.lua file into your project and require it as you would any other Lua module.
 
 
-<a id="org8f92e48"></a>
-
 ## General Information
 
-
-<a id="org4612bd8"></a>
 
 ### Lua version support
 
 -   The library supports both Lua 5.4 and LuaJIT. It should also be compatible with older Lua 5.x versions.
 
 
-<a id="org59a9288"></a>
-
 ### Immutability
 
 -   Methods in the library do not mutate objects; instead, they return new instances. However, as these instances are regular Lua tables, they can still be modified after creation. It is strongly advised **not** to mutate them, as this could lead to unexpected behavior.
 
-
-<a id="orgcd30050"></a>
 
 ### String parsing
 
@@ -109,39 +55,54 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgc536892"></a>
-
 ### Representation of accidentals
 
 -   The library supports two types of accidental representation: special Unicode symbols ('♯' for sharp, '♭' for flat, '𝄪' for double sharp, '𝄫' for double flat) and ASCII characters ('#', 'b', 'x', 'bb', respectively).
 -   The parsers of the Note and Chord objects can handle both types. When transforming these objects into strings, different methods are available for each representation (see below).
 
 
-<a id="orgdc3d4ab"></a>
-
 ### Metamethods
 
 -   Each object implements '\_\_tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
 
 
-<a id="orgae28a4d"></a>
-
 ### Trivia
 
--   Modest is named after Modest Petrovich Mussorgsky, the great Russian composer.
+-   Modest is named after Modest Petrovich Mussorgsky.
 
-
-<a id="orgeb25a0e"></a>
 
 ## Documentation
 
+1.  [Chord](#orgeff45d3)
+    1.  [fromstring(string) -> Chord](#org21a9bdc)
+    2.  [transpose(self, interval) -> Chord](#org67f1d43)
+    3.  [transpose\_down(self, interval) -> Chord](#orge1197cd)
+    4.  [notes(self, octave=nil) -> [Note]](#org3c7d617)
+    5.  [numeric(self) -> [int]](#org49f5ec5)
+    6.  [tostring(self, ascii=nil) -> string](#org413d138)
+    7.  [toascii(self) -> string](#orgbbc7473)
+2.  [Interval](#org6d55dc4)
+    1.  [fromstring(string) -> Interval](#org6d96dba)
+    2.  [new(size, quality="perfect") -> Note](#org4bf9649)
+    3.  [identify(note1, note2) -> Interval](#orgc6fca0c)
+    4.  [semitones(self) -> int](#org1418d14)
+    5.  [tostring(self) -> string](#org045cd77)
+3.  [Note](#org22bedaf)
+    1.  [fromstring(string) -> Note](#orga7e5139)
+    2.  [new(tone, accidental=0, octave=nil) -> Note](#org8eea657)
+    3.  [transpose(self, interval) -> Note](#org59d4e88)
+    4.  [transpose\_down(self, interval) -> Note](#org2190f2e)
+    5.  [pitch\_class(self) -> int](#org29aa8ac)
+    6.  [tostring(self, ascii) -> string](#org2b135d9)
+    7.  [toascii(self) -> string](#orgd0040dd)
 
-<a id="org27a928f"></a>
+
+<a id="orgeff45d3"></a>
 
 ### Chord
 
 
-<a id="orga798d05"></a>
+<a id="org21a9bdc"></a>
 
 #### fromstring(string) -> Chord
 
@@ -156,7 +117,7 @@ After running the command, move the resulting modest.lua file into your project 
         Cmaj7
 
 
-<a id="org50e334b"></a>
+<a id="org67f1d43"></a>
 
 #### transpose(self, interval) -> Chord
 
@@ -171,7 +132,7 @@ After running the command, move the resulting modest.lua file into your project 
         E♭6/9
 
 
-<a id="orgae83427"></a>
+<a id="orge1197cd"></a>
 
 #### transpose\_down(self, interval) -> Chord
 
@@ -186,7 +147,7 @@ After running the command, move the resulting modest.lua file into your project 
         D♭9
 
 
-<a id="org77f8761"></a>
+<a id="org3c7d617"></a>
 
 #### notes(self, octave=nil) -> [Note]
 
@@ -203,7 +164,7 @@ After running the command, move the resulting modest.lua file into your project 
         C♯5
 
 
-<a id="org6abf114"></a>
+<a id="org49f5ec5"></a>
 
 #### numeric(self) -> [int]
 
@@ -225,7 +186,7 @@ After running the command, move the resulting modest.lua file into your project 
         7, 11, 14, 17, 21
 
 
-<a id="orgc3c98b6"></a>
+<a id="org413d138"></a>
 
 #### tostring(self, ascii=nil) -> string
 
@@ -242,7 +203,7 @@ After running the command, move the resulting modest.lua file into your project 
         C#maj7
 
 
-<a id="orga2c8049"></a>
+<a id="orgbbc7473"></a>
 
 #### toascii(self) -> string
 
@@ -257,12 +218,12 @@ After running the command, move the resulting modest.lua file into your project 
         G7(#11)
 
 
-<a id="orged339ef"></a>
+<a id="org6d55dc4"></a>
 
 ### Interval
 
 
-<a id="orgb783526"></a>
+<a id="org6d96dba"></a>
 
 #### fromstring(string) -> Interval
 
@@ -282,7 +243,7 @@ After running the command, move the resulting modest.lua file into your project 
         P4
 
 
-<a id="orga58d9ea"></a>
+<a id="org4bf9649"></a>
 
 #### new(size, quality="perfect") -> Note
 
@@ -318,7 +279,7 @@ After running the command, move the resulting modest.lua file into your project 
         ./modest.lua:263: Invalid combination of size and quality
 
 
-<a id="orgbaa3a37"></a>
+<a id="orgc6fca0c"></a>
 
 #### identify(note1, note2) -> Interval
 
@@ -333,7 +294,7 @@ After running the command, move the resulting modest.lua file into your project 
         P4
 
 
-<a id="org981c0f4"></a>
+<a id="org1418d14"></a>
 
 #### semitones(self) -> int
 
@@ -348,7 +309,7 @@ After running the command, move the resulting modest.lua file into your project 
         4
 
 
-<a id="org05d4e63"></a>
+<a id="org045cd77"></a>
 
 #### tostring(self) -> string
 
@@ -363,12 +324,12 @@ After running the command, move the resulting modest.lua file into your project 
         m6
 
 
-<a id="orge532c5e"></a>
+<a id="org22bedaf"></a>
 
 ### Note
 
 
-<a id="org3698d18"></a>
+<a id="orga7e5139"></a>
 
 #### fromstring(string) -> Note
 
@@ -390,7 +351,7 @@ After running the command, move the resulting modest.lua file into your project 
         E
 
 
-<a id="org15b0881"></a>
+<a id="org8eea657"></a>
 
 #### new(tone, accidental=0, octave=nil) -> Note
 
@@ -412,7 +373,7 @@ After running the command, move the resulting modest.lua file into your project 
         B𝄫
 
 
-<a id="org76e5ba6"></a>
+<a id="org59d4e88"></a>
 
 #### transpose(self, interval) -> Note
 
@@ -427,7 +388,7 @@ After running the command, move the resulting modest.lua file into your project 
         F4
 
 
-<a id="orga6697c3"></a>
+<a id="org2190f2e"></a>
 
 #### transpose\_down(self, interval) -> Note
 
@@ -442,7 +403,7 @@ After running the command, move the resulting modest.lua file into your project 
         A3
 
 
-<a id="orgac90010"></a>
+<a id="org29aa8ac"></a>
 
 #### pitch\_class(self) -> int
 
@@ -457,12 +418,12 @@ After running the command, move the resulting modest.lua file into your project 
         7
 
 
-<a id="org43b6281"></a>
+<a id="org2b135d9"></a>
 
 #### tostring(self, ascii) -> string
 
 
-<a id="orgf332bb2"></a>
+<a id="orgd0040dd"></a>
 
 #### toascii(self) -> string
 
@@ -480,8 +441,6 @@ After running the command, move the resulting modest.lua file into your project 
         D#4
         D#4
 
-
-<a id="org799c25f"></a>
 
 ## Similar libraries in other languages
 
