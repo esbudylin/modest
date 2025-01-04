@@ -6,22 +6,22 @@
 Musical harmony library for Lua.
 
 ** Features
-- Chord Object. Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
-- Note Object. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
-- Interval Object. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
+- [[Chord][Chord Object]]. Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
+- [[Note][Note Object]]. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
+- [[Interval][Interval Object]]. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
 
 ** Installation
 The easiest way to install Modest is via [[https://luarocks.org/][LuaRocks]].
 
-#+begin_src sh
+#+begin_src sh :eval never
   luarocks install modest-harmony
 #+end_src
 
 *** Manual installation
 
-If you want to avoid LuaRocks, you should consider two things about the project. First, Modest depends on [[https://www.inf.puc-rio.br/~roberto/lpeg/][LPeg]], a library partially written in C, which you will need to install manually. Second, the project is written in Fennel, a language that transpiles to Lua. To use Modest in your Lua code, you can either embed Fennel compiler in your project or perform ahead-of-time compilation of the Fennel files. I recommend the latter option. To do so, [[https://fennel-lang.org/setup#downloading-fennel][install Fennel]] and run the following command from the project's root directory:
+If you want to avoid LuaRocks, you should consider two things about the project. First, Modest depends on [[https://www.inf.puc-rio.br/~roberto/lpeg/][LPeg]], a library partially written in C, which you will need to install separately. Second, the project is written in Fennel, a language that transpiles to Lua. To use Modest in your Lua code, you can either embed Fennel compiler in your project or perform ahead-of-time compilation of the Fennel files. I recommend the latter option. To do so, [[https://fennel-lang.org/setup#downloading-fennel][install Fennel]] and run the following command from the project's root directory:
 
-#+begin_src sh
+#+begin_src sh :eval never
   fennel --require-as-include --skip-include re,lpeg --compile modest/init.fnl > modest.lua
 #+end_src
 
