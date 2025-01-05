@@ -181,7 +181,7 @@
                  (.. "Mismatched numeric notation for chord: " chord))))
 
 (parameterized
- :tostring [["Cø" "C7(b5)"]
+ :tostring [["Cø" "Cm7(b5)"]
             [:Ab6/9]
             [:C6]
             ["D13#5b9" "D13(#5b9)"]
@@ -190,7 +190,9 @@
             [:CmM7]
             [:Eaug]
             [:F5]
-            ["F(#11)"]]
+            ["F(#11)"]
+            [:Cadd9]
+            [:C9add13]]
  (fn [chord to_string]
    (let [parsed-chord (Chord.fromstring chord)]
      (assertEquals (parsed-chord:toascii)

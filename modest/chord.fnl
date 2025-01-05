@@ -78,11 +78,11 @@
 
 (fn quality->string [{: triad}]
   (case triad
-    :min :m
     :power :5
     [:sus step] (.. :sus step)
- ; half-diminished chord is handled as a 7(b5) chord due to the lack of an ascii symbol for it
-    (where (or :maj :half-dim)) ""
+    ;; half-diminished chord is handled as a m7(b5) chord due to the lack of an ascii symbol for it
+    (where (or :min :half-dim)) :m
+    :maj ""
     _ triad))
 
 (fn ext->string [{: maj_ext : ext}]
@@ -103,7 +103,7 @@
 
 (fn add->string [{: add : ext}]
   (when add
-    (.. (if (= ext 6) "/" "") add)))
+    (.. (if (= ext 6) :/ :add) add)))
 
 ;; transforms a parsed chord suffix (e.g. mM7, aug, dim7) into a string
 (fn suffix->string [suffix ascii]
