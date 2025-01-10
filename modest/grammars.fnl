@@ -95,10 +95,10 @@
 ")
 
 (fn define-grammar [grammar transformers]
-  (fn [s]
-    (let [pattern (* (re.compile (.. grammar common)
-                                 transformers)
-                     (- (P 1)))] ;; (- (P 1)) ensures that the entire input string matches
+  (let [pattern (* (re.compile (.. grammar common)
+                               transformers)
+                   (- (P 1)))] ;; (- (P 1)) ensures that the entire input string matches
+    (fn [s]
       (pattern:match s))))
 
 (fn define-chord-grammar [transformers]
