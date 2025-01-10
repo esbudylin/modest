@@ -5,7 +5,7 @@
 (local {: assertEquals} (require :luaunit))
 
 (local {: Chord : Interval} (require :modest))
-(local {: map} (require :modest.utils))
+(local {: map : apply} (require :modest.utils))
 
 (import-macros {: parameterized} :test-macros)
 
@@ -223,3 +223,14 @@
                  chord
                  (.. "Mismatched transpose_down result for chord: "
                      chord))))
+
+(parameterized
+ :identify
+ [[:C [:C :E :G]]
+  [:Am [:A :C :E]]
+  [:Fm7 [:F :Ab :C :Eb]]
+  [:D7 [:D :F# :A :C]]
+  [:Emaj7 [:E :G# :B :D#]]]
+ (fn [chord notes]
+   (assertEquals (apply Chord.identify notes)
+                 (Chord.fromstring chord))))

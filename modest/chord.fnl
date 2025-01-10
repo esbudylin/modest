@@ -2,15 +2,17 @@
 ;; License, v. 2.0. If a copy of the MPL was not distributed with this
 ;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-(local {: Note : Interval : is-perfect
-        : semitone-interval : grammars
+(local {: Note : Interval : Grammars
+        : is-perfect : semitone-interval
         : accidental->string : assoc-octave
-        : transpose-util}
+        : dissoc-octave : transpose-util
+        :quality->string interval-quality->string}
        (require :modest.basics))
 
-(local {: flatten-nested : sort-transformed! : safe-prepend! : parse
+(local {: flatten-nested : sort! : safe-prepend! : parse
         : conj! : apply : copy : vals : assoc! : dissoc!
-        : map : reduce : map-into-kv }
+        : map : reduce : map-into-kv : parse-if-string : into-pairs
+        : head : filter : slice : prepend!}
        (require :modest.utils))
 
 (fn build-triad [{: triad}]
@@ -19,16 +21,14 @@
     :maj [[3 :maj] [5]]
     :power [[5]]
     :aug [[3 :maj] [5 :aug]]
+    :dim [[3 :min] [5 :dim]]
     [:sus 2] [[2 :maj] [5]]
-    [:sus 4] [[4] [5]]
-    (where (or :dim :half-dim)) [[3 :min] [5 :dim]]))
+    [:sus 4] [[4] [5]]))
 
-(fn add-7 [{: maj_ext : ext : triad}]
+(fn add-7 [{: seventh : ext}]
   (when ext
     (if (= ext 6) [6 :maj]
-        (= triad :dim) [7 :dim]
-        maj_ext [7 :maj]
-        [7 :min])))
+        [7 seventh])))
 
 (fn extend [{: ext}]
   (when (and ext (> ext 7))
@@ -76,24 +76,29 @@
         (assoc-octave bass bass-octave))
       bass))
 
-(fn quality->string [{: triad}]
-  (case triad
-    :power :5
-    [:sus step] (.. :sus step)
-    ;; half-diminished chord is handled as a m7(b5) chord due to the lack of an ascii symbol for it
-    (where (or :min :half-dim)) :m
-    :maj ""
-    _ triad))
+(fn is-half-dim [{: triad : seventh}]
+  (and (= triad :dim) (= seventh :min)))
 
-(fn ext->string [{: maj_ext : ext}]
+(fn quality->string [{: triad &as chord}]
+  (if (is-half-dim chord)
+      ;; half-diminished chord is handled as a m7(b5) chord due to the lack of an ascii symbol for it
+      :m
+      (case triad
+        :power :5
+        [:sus step] (.. :sus step)
+        :min :m
+        :maj ""
+        _ triad)))
+
+(fn ext->string [{: seventh : ext}]
   (when ext
-      (.. (if maj_ext "M" "") ext)))
+    (.. (if (= seventh :maj) "M" "") ext)))
 
-(fn alterations->string [{: alterations : triad} ascii]
+(fn alterations->string [{: alterations &as chord} ascii]
   (let [alterations (-> (or alterations [])
                         (copy)
-                        (conj! (when (= triad :half-dim) [-1 5]))
-                        (sort-transformed! #(. $ 2)))
+                        (conj! (when (is-half-dim chord) [-1 5]))
+                        (sort! #(. $ 2)))
         alteration-string (reduce (fn [res [acc size]]
                                     (.. res (accidental->string acc ascii) size))
                                   "" alterations)]
@@ -112,6 +117,28 @@
         strings (map #($ suffix) foos)]
     (reduce #(.. $ (or $2 "")) "" strings)))
 
+(fn intervals->suffix [intervals]
+  (let [str-intervals (map Interval.tostring intervals)
+        triad (case str-intervals
+                (where [:P5 & rest] (= (length rest) 0)) :power
+                [:m3 :P5] :min
+                [:M3 :P5] :maj
+                [:M3 :A5] :aug
+                [:M2 :P5] [:sus 2]
+                [:P4 :P5] [:sus 4]
+                [:m3 :d5] :dim
+                _ (error "Chord can't be identified"))
+        ext (case (slice str-intervals 3)
+              [:m7 :M9 :P11 :M13] 13
+              [:m7 :M9 :P11] 11
+              [:m7 :M9] 9
+              [:m7] 7
+              [:M7] 7
+              [:d7] 7
+              [:M6] 6)
+        seventh (-?> intervals (. 3) interval-quality->string)]
+    {: triad : ext : seventh}))
+
 (local Chord {})
 
 (fn chord-transpose-util [{: intervals : suffix : bass : root} interval dir]
@@ -123,15 +150,27 @@
     chord))
 
 (fn Chord.fromstring [str]
-  (let [t (parse grammars.chord str)
+  (let [t (parse Grammars.chord str)
         foos [root build-triad add-7 extend added]
         intervals (map (partial apply Interval.new)
                        (flatten-nested (map #($ t) foos)))
-        alterated (sort-transformed! (alterate intervals t) Interval.semitones)
+        alterated (sort! (alterate intervals t) Interval.semitones)
         chord {:intervals alterated
                :bass t.bass
                :root t.root
                :suffix (dissoc! t :root :bass)}]
+    (setmetatable chord Chord.mt)
+    chord))
+
+(fn Chord.identify [& notes]
+  (assert (> (length notes) 1) "More than single note is expected")
+  (let [notes (map (partial parse-if-string Grammars.note) notes)
+        [root & notes] notes
+        note-pairs (into-pairs root notes)
+        intervals (map (partial apply Interval.identify) note-pairs)
+        chord {:suffix (intervals->suffix intervals)
+               :intervals (prepend! (Interval.new 1) intervals)
+               :root (dissoc-octave root)}]
     (setmetatable chord Chord.mt)
     chord))
 
@@ -160,6 +199,7 @@
 (fn Chord.toascii [self] (Chord.tostring self true))
 
 (set Chord.mt {:__index (dissoc! (copy Chord) :fromstring :mt)
-               :__tostring Chord.tostring})
+               ;; :__tostring Chord.tostring
+               })
 
 Chord

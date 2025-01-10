@@ -25,13 +25,14 @@
     (foo i)))
 
 ;; map into associative table
+;; foo should return two values
 (fn map-into-kv [foo v]
   (collect [_ i (ipairs v)]
     (foo i)))
 
 (fn slice [coll a b]
   (map #(nth $ coll)
-       (range a b)))
+       (range a (or b (length coll)))))
 
 (fn filter [foo v]
   (icollect [_ i (ipairs v)]
@@ -54,7 +55,7 @@
 (fn sum [& nums]
   (reduce #(+ $ $2) 0 nums))
 
-(fn sort-transformed! [coll comp]
+(fn sort! [coll comp]
   (table.sort coll #(< (comp $) (comp $2)))
   coll)
 
@@ -120,7 +121,7 @@
   t)
 
 (fn parse [grammar str]
-  (or (grammar:match str)
+  (or (grammar str)
       (error (.. "Can't parse: " str))))
 
 (fn string? [str]
@@ -131,11 +132,14 @@
       (parse grammar n)
       n))
 
-{: sort-transformed! : table?
- : second : slice : dec
- : circular-index : conj!
+(fn into-pairs [n t]
+  (icollect [_ i (ipairs t)]
+    [n i]))
+
+{: sort! : table? : second : slice : dec
+ : circular-index : conj! : prepend!
  : safe-prepend! : flatten-nested : swap
  : apply : inc : map-into-kv
- : sum : copy : keys : vals
+ : sum : copy : keys : vals : filter
  : assoc! : dissoc! : parse : parse-if-string
- : map : slice : range : reduce : head} 
+ : map : slice : range : reduce : head : into-pairs} 
