@@ -230,7 +230,12 @@
   [:Am [:A :C :E]]
   [:Fm7 [:F :Ab :C :Eb]]
   [:D7 [:D :F# :A :C]]
-  [:Emaj7 [:E :G# :B :D#]]]
+  [:Emaj7 [:E :G# :B :D#]]
+  [:C6 [:C :E :G :A]]
+  [:Cm6 [:C :Eb :G :A]]
+  [:Adim [:A :C :Eb]]
+  [:Adim7 [:A :C :Eb :Gb]]
+  ["C⌀" [:C :Eb :Gb :Bb]]]
  (fn [chord notes]
    (assertEquals (apply Chord.identify notes)
                  (Chord.fromstring chord))))

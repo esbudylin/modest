@@ -5,15 +5,16 @@
 (local {: Note : Interval : Grammars
         : is-perfect : semitone-interval
         : accidental->string : assoc-octave
-        : dissoc-octave : transpose-util
-        :quality->string interval-quality->string}
+        : dissoc-octave : transpose-util}
        (require :modest.basics))
 
 (local {: flatten-nested : sort! : safe-prepend! : parse
         : conj! : apply : copy : vals : assoc! : dissoc!
         : map : reduce : map-into-kv : parse-if-string : into-pairs
-        : head : filter : slice : prepend!}
+        : prepend!}
        (require :modest.utils))
+
+(local {: intervals->suffix } (require :modest.identify))
 
 (fn build-triad [{: triad}]
   (case triad
@@ -116,28 +117,6 @@
               add->string #(alterations->string $ ascii)]
         strings (map #($ suffix) foos)]
     (reduce #(.. $ (or $2 "")) "" strings)))
-
-(fn intervals->suffix [intervals]
-  (let [str-intervals (map Interval.tostring intervals)
-        triad (case str-intervals
-                (where [:P5 & rest] (= (length rest) 0)) :power
-                [:m3 :P5] :min
-                [:M3 :P5] :maj
-                [:M3 :A5] :aug
-                [:M2 :P5] [:sus 2]
-                [:P4 :P5] [:sus 4]
-                [:m3 :d5] :dim
-                _ (error "Chord can't be identified"))
-        ext (case (slice str-intervals 3)
-              [:m7 :M9 :P11 :M13] 13
-              [:m7 :M9 :P11] 11
-              [:m7 :M9] 9
-              [:m7] 7
-              [:M7] 7
-              [:d7] 7
-              [:M6] 6)
-        seventh (-?> intervals (. 3) interval-quality->string)]
-    {: triad : ext : seventh}))
 
 (local Chord {})
 

@@ -49,7 +49,7 @@
 
     power <- {:triad: '5' -> 'power' :}
 
-    diminished <- {:triad: ('dim' / 'o') -> 'dim':} {:seventh: '' -> 'dim' => seventh :}
+    diminished <- {:triad: ('dim' / 'o') -> 'dim':} (&seventh {:seventh: '' -> 'dim' => seventh :})?
 
     -- half-diminished chord is a seventh chord even if 7 isn't notated
     half_diminished <- {:triad: crossed_o -> 'dim':} (&seventh / {:ext: '' -> toseven :}) {:seventh: '' -> 'min' => seventh :}
@@ -107,7 +107,7 @@
   ;; This function ensures that the quality of the seventh
   ;; ("maj", "min", "dim") is only set once.
   ;; If the seventh quality has already been matched, it returns the first matched quality
-  ;; instead of overwriting it with subsequent matches.
+  ;; instead of overwriting it with a subsequent match.
   (fn seventh [_ pos new-quality]
     (if (not seventh-quality)
         (do (set seventh-quality new-quality)

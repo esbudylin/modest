@@ -142,4 +142,5 @@
  : apply : inc : map-into-kv
  : sum : copy : keys : vals : filter
  : assoc! : dissoc! : parse : parse-if-string
- : map : slice : range : reduce : head : into-pairs} 
+ : map : slice : range : reduce : head : into-pairs
+ : empty?} 
