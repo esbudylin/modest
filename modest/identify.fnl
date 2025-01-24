@@ -93,7 +93,7 @@
 (fn identify-ext [{: alteration-map &as interval-obj}]
   (fn trim-ext [ext]
     (if (. alteration-map ext)
-        (if (not= 7 ext)
+        (if (and (not= 7 ext) (not= 6 ext))
             (trim-ext (- ext 2))
             nil)
         ext))

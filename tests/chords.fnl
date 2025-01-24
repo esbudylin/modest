@@ -248,6 +248,7 @@
   ["C7♯11" [:C :E :G "B♭" "F♯"]]
   ["C13♯11" [:C :E :G "B♭" :D "F♯" :A]]
   ["Cm9(#11)" [:C :Eb :G :Bb :D :F#]]
+  ["Cm(b6)" [:C :Eb :G :Ab]]
   [:C13b5#9 [:C :E "G♭" "B♭" "D♯" :F :A]]
   [:Caug [:C :E :G#]]]
  (fn [chord notes]
