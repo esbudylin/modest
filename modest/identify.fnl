@@ -34,46 +34,50 @@
                (not (. alteration-map e.size)))
       (not-identified))))
 
-(macro interval-cond [interval-obj & rest]
+(macro interval-cond [interval-obj intervals-field & rest]
   (let [cases (icollect [i e (ipairs rest)]
                 (if (= (% i 2) 1)
                     `(includes-sequence
-                      (. ,interval-obj :normalized-intervals-strings)
+                      (. ,interval-obj ,intervals-field)
                       ,e
                       (. ,interval-obj :identified-intervals))
                     e))]
     `(if ,(unpack cases))))
 
-(fn is-power [{: intervals }]
-  (let [[first & rest] intervals]
-    (and (= first.size 5)
-         (= first.quality 0)
-         (= (length rest) 0))))
+(fn identify-power [{: intervals : identified-intervals }]
+  (let [[first & rest] intervals
+        power (and (= first.size 5)
+                   (= first.quality 0)
+                   (= (length rest) 0))]
+    (when power
+      (set (. identified-intervals 1) true)
+      :power)))
 
-(fn is-dim [{: intervals-strings : identified-intervals : alteration-map}]
-  (let [dim (includes-sequence intervals-strings
-                               [:m3 :d5]
-                               identified-intervals)]
-    (when dim
+(fn identify-altered-triad [{: alteration-map &as interval-obj}]
+  (let [triad
+        (interval-cond interval-obj :intervals-strings
+                       [:m3 :d5] :dim
+                       [:M3 :A5] :aug)]
+    (when triad
       (set (. alteration-map 5) nil)
-      true)))
+      triad)))
 
 (fn identify-triad* [interval-obj]
-  (interval-cond interval-obj
+  (interval-cond interval-obj :normalized-intervals-strings
                  [:m3 :P5] :min
                  [:M3 :P5] :maj
-                 [:M3 :A5] :aug
                  [:M2 :P5] [:sus 2]
                  [:P4 :P5] [:sus 4]))
 
 (fn identify-triad [interval-obj]
-  (if (is-power interval-obj) :power
-      (is-dim interval-obj) :dim
-      (or (identify-triad* interval-obj)
-          (not-identified))))
+  (or
+   (identify-power interval-obj)
+   (identify-altered-triad interval-obj)
+   (identify-triad* interval-obj)
+   (not-identified)))
 
 (fn identify-ext* [interval-obj]
-  (interval-cond interval-obj
+  (interval-cond interval-obj :normalized-intervals-strings
                  [:m7 :M9 :P11 :M13] 13
                  [:m7 :M9 :P11] 11
                  [:m7 :M9] 9

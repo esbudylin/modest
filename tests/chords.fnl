@@ -233,6 +233,7 @@
   [:Emaj7 [:E :G# :B :D#]]
   [:C6 [:C :E :G :A]]
   [:Cm6 [:C :Eb :G :A]]
+  [:F5 [:F :C]]
   [:Adim [:A :C :Eb]]
   [:Adim7 [:A :C :Eb :Gb]]
   ["C⌀" [:C :Eb :Gb :Bb]]
@@ -246,7 +247,9 @@
   ["C7♯9" [:C :E :G "B♭" "D♯"]]
   ["C7♯11" [:C :E :G "B♭" "F♯"]]
   ["C13♯11" [:C :E :G "B♭" :D "F♯" :A]]
-  [:C13b5#9 [:C :E "G♭" "B♭" "D♯" :F :A]]]
+  ["Cm9(#11)" [:C :Eb :G :Bb :D :F#]]
+  [:C13b5#9 [:C :E "G♭" "B♭" "D♯" :F :A]]
+  [:Caug [:C :E :G#]]]
  (fn [chord notes]
    (assertEquals (apply Chord.identify notes)
                  (Chord.fromstring chord))))
