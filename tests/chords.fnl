@@ -2,7 +2,7 @@
 ;; License, v. 2.0. If a copy of the MPL was not distributed with this
 ;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-(local {: assertEquals} (require :luaunit))
+(local {: assertEquals : assertError} (require :luaunit))
 
 (local {: Chord : Interval} (require :modest))
 (local {: map : apply} (require :modest.utils))
@@ -254,3 +254,12 @@
  (fn [chord notes]
    (assertEquals (apply Chord.identify notes)
                  (Chord.fromstring chord))))
+
+(parameterized
+ :invalid_chords
+ [[:Eb :F :G]
+  [:C :D :Eb]
+  [:C :E :E# :G]
+  [:C :Db :D :E :G]]
+ (fn [& notes]
+   (assertError #(apply Chord.identify notes))))
