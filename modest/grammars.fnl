@@ -58,7 +58,7 @@
     aug <- {:triad: ('+' / 'aug') -> 'aug' :} (maj_7 &extended_seventh)?
 
     sixth <- {:ext: '6' -> tonumber :}
-    seventh <- ('7' / '9' / '11' / '13' / '15') -> tonumber
+    seventh <- ('7' / '9' / '11' / '13') -> tonumber
 
     extended_seventh <- {:ext: seventh :} {:seventh: '' -> 'min' => seventh :}
 
