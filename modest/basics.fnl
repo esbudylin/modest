@@ -163,13 +163,16 @@
 (fn Note.transpose_down [self interval]
   (transpose-util self interval -1))
 
-(fn Note.tostring [{: tone : accidental : octave} ascii]
+(fn note->string [{: tone : accidental : octave} ascii]
   (.. tone
       (accidental->string accidental ascii)
       (or octave "")))
 
-(fn Note.toascii [note]
-  (Note.tostring note true))
+(fn Note.tostring [self]
+  (note->string self))
+
+(fn Note.toascii [self]
+  (note->string self true))
 
 (λ Interval.new [size ?quality]
   (let [quality
@@ -234,4 +237,4 @@
 
 {: Interval : Note : Grammars
  : is-perfect : semitone-interval : accidental->string : quality->string
- : assoc-octave : dissoc-octave : transpose-util }
+ : assoc-octave : dissoc-octave : transpose-util : note->string}

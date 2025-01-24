@@ -5,7 +5,7 @@
 (local {: Note : Interval : Grammars
         : is-perfect : semitone-interval
         : accidental->string : assoc-octave
-        : dissoc-octave : transpose-util}
+        : dissoc-octave : transpose-util : note->string}
        (require :modest.basics))
 
 (local {: flatten-nested : sort! : safe-prepend! : parse
@@ -118,6 +118,12 @@
         strings (map #($ suffix) foos)]
     (reduce #(.. $ (or $2 "")) "" strings)))
 
+(fn chord->string [{: root : bass : suffix} ascii]
+  (let [str-func #(note->string $ ascii)]
+    (.. (str-func root)
+        (suffix->string suffix ascii)
+        (if bass (.. "/" (str-func bass)) ""))))
+
 (local Chord {})
 
 (fn chord-transpose-util [{: intervals : suffix : bass : root} interval dir]
@@ -167,13 +173,9 @@
 (fn Chord.transpose_down [self interval]
   (chord-transpose-util self interval -1))
 
-(fn Chord.tostring [{: root : bass : suffix} ascii]
-  (let [str-func #(Note.tostring $ ascii)]
-    (.. (str-func root)
-        (suffix->string suffix ascii)
-        (if bass (.. "/" (str-func bass)) ""))))
+(fn Chord.tostring [self] (chord->string self))
 
-(fn Chord.toascii [self] (Chord.tostring self true))
+(fn Chord.toascii [self] (chord->string self true))
 
 (set Chord.mt {:__index (dissoc! (copy Chord) :fromstring :mt)
                :__tostring Chord.tostring})
