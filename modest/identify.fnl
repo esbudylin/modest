@@ -1,4 +1,4 @@
-(local {: quality->string} (require :modest.basics))
+(local {: quality->string : Interval } (require :modest.basics))
 
 (local {: map : head : empty?} (require :modest.utils))
 
@@ -78,4 +78,16 @@
         add (identify-add interval-obj)]
     {: triad : ext : seventh : add}))
 
-{: intervals->suffix}
+(fn into-intervals [root & notes]
+  (var last-interval nil)
+  (icollect [_ note (ipairs notes)]
+    (let [without-octave (not (and root.octave note.octave))
+          interval (Interval.identify root note)
+          lesser-interval (when last-interval
+                            (< (interval:semitones) (last-interval:semitones)))]
+      (if (and without-octave lesser-interval)
+          (set interval.size (+ interval.size 7)))
+      (set last-interval interval)
+      interval)))
+
+{: intervals->suffix : into-intervals}

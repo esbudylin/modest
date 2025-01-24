@@ -132,15 +132,10 @@
       (parse grammar n)
       n))
 
-(fn into-pairs [n t]
-  (icollect [_ i (ipairs t)]
-    [n i]))
-
 {: sort! : table? : second : slice : dec
  : circular-index : conj! : prepend!
  : safe-prepend! : flatten-nested : swap
  : apply : inc : map-into-kv
  : sum : copy : keys : vals : filter
  : assoc! : dissoc! : parse : parse-if-string
- : map : slice : range : reduce : head : into-pairs
- : empty?} 
+ : map : slice : range : reduce : head : empty?} 

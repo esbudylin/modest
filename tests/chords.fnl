@@ -236,8 +236,11 @@
   [:Adim [:A :C :Eb]]
   [:Adim7 [:A :C :Eb :Gb]]
   ["C⌀" [:C :Eb :Gb :Bb]]
+  [:Amadd4 [:A :C :D :E]]
+  [:C9 [:C :E :G :Bb :D]]
   [:Cadd2 [:C :D :E :G]]
-  [:Amadd4 [:A :C :D :E]]]
+  [:Cadd9 [:C :E :G :D]]
+  [:C13 [:C :E :G :Bb :D :F :A]]]
  (fn [chord notes]
    (assertEquals (apply Chord.identify notes)
                  (Chord.fromstring chord))))

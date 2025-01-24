@@ -10,11 +10,11 @@
 
 (local {: flatten-nested : sort! : safe-prepend! : parse
         : conj! : apply : copy : vals : assoc! : dissoc!
-        : map : reduce : map-into-kv : parse-if-string : into-pairs
-        : prepend!}
+        : map : reduce : map-into-kv : parse-if-string
+        : prepend! : head}
        (require :modest.utils))
 
-(local {: intervals->suffix } (require :modest.identify))
+(local {: intervals->suffix : into-intervals } (require :modest.identify))
 
 (fn build-triad [{: triad}]
   (case triad
@@ -144,12 +144,10 @@
 (fn Chord.identify [& notes]
   (assert (> (length notes) 1) "More than single note is expected")
   (let [notes (map (partial parse-if-string Grammars.note) notes)
-        [root & notes] notes
-        note-pairs (into-pairs root notes)
-        intervals (map (partial apply Interval.identify) note-pairs)
+        intervals (apply into-intervals notes)
         chord {:suffix (intervals->suffix intervals)
                :intervals (prepend! (Interval.new 1) intervals)
-               :root (dissoc-octave root)}]
+               :root (dissoc-octave (head notes))}]
     (setmetatable chord Chord.mt)
     chord))
 
