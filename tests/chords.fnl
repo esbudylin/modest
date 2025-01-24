@@ -240,7 +240,13 @@
   [:C9 [:C :E :G :Bb :D]]
   [:Cadd2 [:C :D :E :G]]
   [:Cadd9 [:C :E :G :D]]
-  [:C13 [:C :E :G :Bb :D :F :A]]]
+  [:C13 [:C :E :G :Bb :D :F :A]]
+  [:C6/9 [:C :E :G :A :D]]
+  [:C7b9 [:C :E :G "B♭" "D♭"]]
+  ["C7♯9" [:C :E :G "B♭" "D♯"]]
+  ["C7♯11" [:C :E :G "B♭" "F♯"]]
+  ["C13♯11" [:C :E :G "B♭" :D "F♯" :A]]
+  [:C13b5#9 [:C :E "G♭" "B♭" "D♯" :F :A]]]
  (fn [chord notes]
    (assertEquals (apply Chord.identify notes)
                  (Chord.fromstring chord))))

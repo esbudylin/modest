@@ -132,10 +132,15 @@
       (parse grammar n)
       n))
 
+(fn concat! [t1 t2]
+  (each [k v (pairs t2)]
+    (set (. t1 k) v)))
+
 {: sort! : table? : second : slice : dec
  : circular-index : conj! : prepend!
  : safe-prepend! : flatten-nested : swap
  : apply : inc : map-into-kv
  : sum : copy : keys : vals : filter
  : assoc! : dissoc! : parse : parse-if-string
- : map : slice : range : reduce : head : empty?} 
+ : map : slice : range : reduce : head : empty?
+ : concat!} 

@@ -1,50 +1,78 @@
+;; This Source Code Form is subject to the terms of the Mozilla Public
+;; License, v. 2.0. If a copy of the MPL was not distributed with this
+;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 (local {: quality->string : Interval } (require :modest.basics))
 
-(local {: map : head : empty?} (require :modest.utils))
+(local {: map : head : empty? : concat!} (require :modest.utils))
 
 (local unpack (or table.unpack _G.unpack))
-
-(fn includes-sequence [t seq discovered]
-  (each [i e (ipairs t) &until (empty? seq)]
-    (when (= e (head seq))
-      (set (. discovered i) true)
-      (table.remove seq 1)))
-  (empty? seq))
-
-(fn undiscovered [{: seq : discovered}]
-  (collect [i e (ipairs seq)]
-    (when (not (. discovered i))
-      (values i e))))
 
 (macro table-set [& seq]
   (collect [_ e (ipairs seq)]
     (values e true)))
 
+(macro not-identified [] '(error "Chord can't be identified"))
+
+(fn includes-sequence [t seq discovered]
+  (let [discovered-temp (collect [i e (ipairs t) &until (empty? seq)]
+                          (when (= e (head seq))
+                            (set (. discovered i) true)
+                            (table.remove seq 1)))]
+    (when (empty? seq)
+      (concat! discovered discovered-temp)
+      true)))
+
+(fn unidentifed-intervals [{: intervals : identified-intervals}]
+  (collect [i e (ipairs intervals)]
+    (when (not (. identified-intervals i))
+      (values i e))))
+
+(fn ensure-chord-identified [{: intervals : alteration-map : identified-intervals}]
+  (each [i e (ipairs intervals)]
+    (when (and (not (. identified-intervals i))
+               (not (. alteration-map e.size)))
+      (not-identified))))
+
 (macro interval-cond [interval-obj & rest]
   (let [cases (icollect [i e (ipairs rest)]
                 (if (= (% i 2) 1)
                     `(includes-sequence
-                      (. ,interval-obj :str-seq)
+                      (. ,interval-obj :normalized-intervals-strings)
                       ,e
-                      (. ,interval-obj :discovered))
+                      (. ,interval-obj :identified-intervals))
                     e))]
     `(if ,(unpack cases))))
 
-(fn is-power [{: str-seq}]
-  (let [[first & rest] str-seq]
-    (and (= first :P5)
+(fn is-power [{: intervals }]
+  (let [[first & rest] intervals]
+    (and (= first.size 5)
+         (= first.quality 0)
          (= (length rest) 0))))
 
-(fn identify-triad [interval-obj]
+(fn is-dim [{: intervals-strings : identified-intervals : alteration-map}]
+  (let [dim (includes-sequence intervals-strings
+                               [:m3 :d5]
+                               identified-intervals)]
+    (when dim
+      (set (. alteration-map 5) nil)
+      true)))
+
+(fn identify-triad* [interval-obj]
   (interval-cond interval-obj
                  [:m3 :P5] :min
                  [:M3 :P5] :maj
                  [:M3 :A5] :aug
                  [:M2 :P5] [:sus 2]
-                 [:P4 :P5] [:sus 4]
-                 [:m3 :d5] :dim))
+                 [:P4 :P5] [:sus 4]))
 
-(fn identify-ext [interval-obj]
+(fn identify-triad [interval-obj]
+  (if (is-power interval-obj) :power
+      (is-dim interval-obj) :dim
+      (or (identify-triad* interval-obj)
+          (not-identified))))
+
+(fn identify-ext* [interval-obj]
   (interval-cond interval-obj
                  [:m7 :M9 :P11 :M13] 13
                  [:m7 :M9 :P11] 11
@@ -54,29 +82,62 @@
                  [:d7] 7
                  [:M6] 6))
 
-(fn identify-add [{: discovered &as interval-obj}]
+(fn identify-seventh [ext intervals]
+  (when (and ext (not= 6 ext))
+    (-?> intervals (. 3) quality->string)))
+
+(fn identify-ext [{: alteration-map &as interval-obj}]
+  (fn trim-ext [ext]
+    (if (. alteration-map ext)
+        (if (not= 7 ext)
+            (trim-ext (- ext 2))
+            nil)
+        ext))
+  (let [ext (identify-ext* interval-obj)]
+    (trim-ext ext)))
+
+(fn identify-add [{: identified-intervals &as interval-obj}]
   (let [add-intervals (table-set 2 4 9 11 13)]
     (var res nil)
-    (each [i interval (pairs (undiscovered interval-obj)) &until res]
+    (each [i interval (pairs (unidentifed-intervals interval-obj)) &until res]
       (when (and (. add-intervals interval.size)
-               (= interval.quality 0))
-          (do (set (. discovered i) true)
-              (set res interval.size))))
+                 (= interval.quality 0))
+        (do (set (. identified-intervals i) true)
+            (set res interval.size))))
     res))
 
+(fn handle-alterations [intervals]
+  (let [alteration-interevals (table-set 4 5 6 9 11 13)
+        alterations {}
+        intervals (icollect [_ interval (ipairs intervals)]
+                    (if (and (. alteration-interevals interval.size)
+                             (not= interval.quality 0))
+                        (do
+                          (set (. alterations interval.size) interval.quality)
+                          (Interval.new interval.size 0))
+                        interval))]
+    (values intervals alterations)))
+
+(fn alterations->seq [alteration-map]
+  (when (next alteration-map)
+      (icollect [size quality (pairs alteration-map)]
+        [quality size])))
+
 (fn intervals->suffix [intervals]
-  (let [interval-obj {:seq intervals
-                      :str-seq (map tostring intervals)
-                      :discovered []}
-        triad (if (is-power interval-obj)
-                  :power
-                  (or (identify-triad interval-obj)
-                      (error "Chord can't be identified")))
+  (let [(normalized-intervals alteration-map) (handle-alterations intervals)
+        interval-obj {: normalized-intervals
+                      : intervals
+                      : alteration-map
+                      :normalized-intervals-strings (map tostring normalized-intervals)
+                      :intervals-strings (map tostring intervals)
+                      :identified-intervals []}
+        triad (identify-triad interval-obj)
         ext (identify-ext interval-obj)
-        seventh (when (and ext (not= 6 ext))
-                  (-?> intervals (. 3) quality->string))
+        seventh (identify-seventh ext intervals)
         add (identify-add interval-obj)]
-    {: triad : ext : seventh : add}))
+    (ensure-chord-identified interval-obj)
+    {: triad : ext : seventh : add
+     :alterations (alterations->seq alteration-map)}))
 
 (fn into-intervals [root & notes]
   (var last-interval nil)
