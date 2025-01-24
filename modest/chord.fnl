@@ -176,7 +176,6 @@
 (fn Chord.toascii [self] (Chord.tostring self true))
 
 (set Chord.mt {:__index (dissoc! (copy Chord) :fromstring :mt)
-               ;; :__tostring Chord.tostring
-               })
+               :__tostring Chord.tostring})
 
 Chord
