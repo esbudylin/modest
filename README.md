@@ -5,9 +5,9 @@ Musical harmony library for Lua.
 
 ## Features
 
--   [Chord Object](#org929451e). Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
--   [Note Object](#org9691062). Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
--   [Interval Object](#org0c07696). Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
+-   [Chord Object](#org9573334). Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
+-   [Note Object](#orgfb528cd). Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
+-   [Interval Object](#org1144886). Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
 
 
 ## Installation
@@ -49,7 +49,7 @@ After running the command, move the resulting modest.lua file into your project 
 -   Any method that requires one of the library objects as an argument can also accept a string, which will be parsed using the appropriate 'fromstring' method. For example, both of the following expressions are valid.
     
     ```lua
-    local note = Note.fromstring("C5")
+    note = Note.fromstring("C5")
     note:transpose("P5")
     note:transpose(Interval.fromstring("P5"))
     ```
@@ -63,7 +63,7 @@ After running the command, move the resulting modest.lua file into your project 
 
 ### Metamethods
 
--   Each object implements '\_\_tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
+-   Each object implements '\_\_tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during calls to 'print' or 'tostring' functions. The implementation uses Unicode symbols for accidentals.
 
 
 ### Trivia
@@ -73,51 +73,79 @@ After running the command, move the resulting modest.lua file into your project 
 
 ## Documentation
 
-1.  [Chord](#org929451e)
-    1.  [fromstring(string) -> Chord](#org57b2e97)
-    2.  [transpose(self, interval) -> Chord](#org74b97a9)
-    3.  [transpose\_down(self, interval) -> Chord](#org65f2642)
-    4.  [notes(self, octave=nil) -> [Note]](#org4e6db16)
-    5.  [numeric(self) -> [int]](#org1a8bec5)
-    6.  [tostring(self, ascii=nil) -> string](#org55f4629)
-    7.  [toascii(self) -> string](#orge0f00a5)
-2.  [Interval](#org0c07696)
-    1.  [fromstring(string) -> Interval](#org7ade9cb)
-    2.  [new(size, quality="perfect") -> Note](#org5d218be)
-    3.  [identify(note1, note2) -> Interval](#org546e8f2)
-    4.  [semitones(self) -> int](#org1549fc4)
-    5.  [tostring(self) -> string](#org0bbe80a)
-3.  [Note](#org9691062)
-    1.  [fromstring(string) -> Note](#orgd2ec028)
-    2.  [new(tone, accidental=0, octave=nil) -> Note](#org5938ee2)
-    3.  [transpose(self, interval) -> Note](#orgf76e184)
-    4.  [transpose\_down(self, interval) -> Note](#org121c26e)
-    5.  [pitch\_class(self) -> int](#orgb69877d)
-    6.  [tostring(self, ascii) -> string](#org7b6883e)
-    7.  [toascii(self) -> string](#org7e8d908)
+1.  [Chord](#org9573334)
+    1.  [fromstring(string) -> Chord](#orge2724a8)
+    2.  [identify(& notes) -> Chord](#org9fecf20)
+    3.  [transpose(self, interval) -> Chord](#org4c5e443)
+    4.  [transpose\_down(self, interval) -> Chord](#orgdfb2a5f)
+    5.  [notes(self, octave=nil) -> [Note]](#orgc84fc0e)
+    6.  [numeric(self) -> [int]](#orge283d4b)
+    7.  [tostring(self) -> string](#org9898751)
+    8.  [toascii(self) -> string](#org8b4391f)
+2.  [Interval](#org1144886)
+    1.  [fromstring(string) -> Interval](#org8c3103f)
+    2.  [new(size, quality="perfect") -> Note](#org9e3b802)
+    3.  [identify(note1, note2) -> Interval](#org431376b)
+    4.  [semitones(self) -> int](#org412d7f0)
+    5.  [tostring(self) -> string](#orgffa8ec5)
+3.  [Note](#orgfb528cd)
+    1.  [fromstring(string) -> Note](#orge3ca6a0)
+    2.  [new(tone, accidental=0, octave=nil) -> Note](#org32a3936)
+    3.  [transpose(self, interval) -> Note](#org3edcda8)
+    4.  [transpose\_down(self, interval) -> Note](#orgebb3cfd)
+    5.  [pitch\_class(self) -> int](#org5a2b6b9)
+    6.  [tostring(self) -> string](#orgd606fbd)
+    7.  [toascii(self) -> string](#orgafb4b34)
 
 
-<a id="org929451e"></a>
+<a id="org9573334"></a>
 
 ### Chord
 
 
-<a id="org57b2e97"></a>
+<a id="orge2724a8"></a>
 
 #### fromstring(string) -> Chord
 
--   Parses a string and returns a Chord object.
+-   Parses a string and returns a Chord object. Supports most of the chord types (see table below). Aims to be as flexible as possible when parsing a chord suffix, allowing various synonymous notations.
+
+| Supported chord type           | Examples             |
+|------------------------------ |-------------------- |
+| Basic triads                   | C, Cm                |
+| Augmented chords               | Caug                 |
+| Diminished and half-diminished | Cdim, C⌀7, Cdim7     |
+| Suspended chords               | Csus2, C9sus4        |
+| Seventh chords                 | C7, CM7, CminMaj7    |
+| Extended chords up to the 13th | C9, C13              |
+| Added sixth and 6/9 chords     | C6, Cm(♭6), C6/9     |
+| Added tones                    | Cadd2, Cadd9, C(♯11) |
+| Altered chords                 | C7♯5, C7♯5♭9         |
+| Power chords                   | C5                   |
+| Slash chords                   | C/G                  |
+
 -   Example:
     
     ```lua
-    local chord = Chord.fromstring("Cmaj7")
-    print(chord)
+    CM7 = Chord.fromstring("Cmaj7")
     ```
+
+
+<a id="org9fecf20"></a>
+
+#### identify(& notes) -> Chord
+
+-   Identifies a chord based on the given notes. Accepts a variable number of string representations (e.g., "C", "E", "G") or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
+-   Examples:
     
-        CM7
+    ```lua
+    Cadd9 = Chord.identify("C", "E", "G", "D")
+    
+    -- Can also accept note objects
+    Daug = Chord.identify("D", "F#", Note.fromstring("A#"))
+    ```
 
 
-<a id="org74b97a9"></a>
+<a id="org4c5e443"></a>
 
 #### transpose(self, interval) -> Chord
 
@@ -125,14 +153,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local transposed = Chord.fromstring("C6/9"):transpose("m3")
-    print(transposed)
+    Eb6_9 = Chord.fromstring("C6/9"):transpose("m3")
     ```
-    
-        E♭6/9
 
 
-<a id="org65f2642"></a>
+<a id="orgdfb2a5f"></a>
 
 #### transpose\_down(self, interval) -> Chord
 
@@ -140,14 +165,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local transposed_down = Chord.fromstring("Ab9"):transpose_down("P5")
-    print(transposed_down)
+    Db9 = Chord.fromstring("Ab9"):transpose_down("P5")
     ```
-    
-        D♭9
 
 
-<a id="org4e6db16"></a>
+<a id="orgc84fc0e"></a>
 
 #### notes(self, octave=nil) -> [Note]
 
@@ -155,7 +177,7 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local notes = Chord.fromstring("F#"):notes(4)
+    notes = Chord.fromstring("F#"):notes(4)
     for _, note in ipairs(notes) do print(note) end
     ```
     
@@ -164,7 +186,7 @@ After running the command, move the resulting modest.lua file into your project 
         C♯5
 
 
-<a id="org1a8bec5"></a>
+<a id="orge283d4b"></a>
 
 #### numeric(self) -> [int]
 
@@ -172,58 +194,52 @@ After running the command, move the resulting modest.lua file into your project 
 -   Examples:
     
     ```lua
-    local numeric = Chord.fromstring("C/Bb"):numeric()
+    numeric = Chord.fromstring("C/Bb"):numeric()
     print(table.concat(numeric, ", "))
     ```
     
         -2, 0, 4, 7
     
     ```lua
-    local numeric = Chord.fromstring("G9"):numeric()
+    numeric = Chord.fromstring("G9"):numeric()
     print(table.concat(numeric, ", "))
     ```
     
         7, 11, 14, 17, 21
 
 
-<a id="org55f4629"></a>
+<a id="org9898751"></a>
 
-#### tostring(self, ascii=nil) -> string
+#### tostring(self) -> string
 
--   Converts the chord into a string. By default accidental will be represented with special Unicode characters. Pass a true value as a parameter to get an ASCII representation.
+-   Converts the chord into a string. Accidentals will be represented with special Unicode characters.
 -   Example:
     
     ```lua
-    local chord = Chord.fromstring("C#maj7")
-    print(chord:tostring())
-    print(chord:tostring(true))
+    chord = Chord.fromstring("C#maj7")
+    assert(chord:tostring() == "C♯M7")
     ```
-    
-        C♯M7
-        C#M7
 
 
-<a id="orge0f00a5"></a>
+<a id="org8b4391f"></a>
 
 #### toascii(self) -> string
 
--   Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
+-   Returns the chord as a string with ASCII representations for accidentals.
 -   Example:
     
     ```lua
-    local chord = Chord.fromstring("G7#11")
-    print(chord:toascii())
+    chord = Chord.fromstring("G7#11")
+    assert(chord:toascii() == "G7(#11)")
     ```
-    
-        G7(#11)
 
 
-<a id="org0c07696"></a>
+<a id="org1144886"></a>
 
 ### Interval
 
 
-<a id="org7ade9cb"></a>
+<a id="org8c3103f"></a>
 
 #### fromstring(string) -> Interval
 
@@ -236,14 +252,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local interval = Interval.fromstring("P4")
-    print(interval)
+    P4 = Interval.fromstring("P4")
     ```
-    
-        P4
 
 
-<a id="org5d218be"></a>
+<a id="org9e3b802"></a>
 
 #### new(size, quality="perfect") -> Note
 
@@ -251,35 +264,20 @@ After running the command, move the resulting modest.lua file into your project 
 -   Examples:
     
     ```lua
-    local interval = Interval.new(3, "aug")
-    print(interval)
+    A3 = Interval.new(3, "aug")
+    M13 = Interval.new(13, "maj")
+    P5 = Interval.new(5)
     ```
     
-        A3
-    
     ```lua
-    local interval = Interval.new(13, "maj")
-    print(interval)
-    ```
-    
-        M13
-    
-    ```lua
-    local interval = Interval.new(5)
-    print(interval)
-    ```
-    
-        P5
-    
-    ```lua
-    local _, err = pcall(function() Interval.new(5, "min") end)
+    _, err = pcall(function() Interval.new(5, "min") end)
     print(err)
     ```
     
-        ./modest.lua:263: Invalid combination of size and quality
+        ./modest.lua:284: Invalid combination of size and quality
 
 
-<a id="org546e8f2"></a>
+<a id="org431376b"></a>
 
 #### identify(note1, note2) -> Interval
 
@@ -287,14 +285,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local interval = Interval.identify("C", "F")
-    print(interval)
+    P4 = Interval.identify("C", "F")
     ```
-    
-        P4
 
 
-<a id="org1549fc4"></a>
+<a id="org412d7f0"></a>
 
 #### semitones(self) -> int
 
@@ -302,14 +297,12 @@ After running the command, move the resulting modest.lua file into your project 
 -   Examples:
     
     ```lua
-    local semitones = Interval.fromstring("M3"):semitones()
-    print(semitones)
+    semitones = Interval.fromstring("M3"):semitones()
+    assert(semitones == 4)
     ```
-    
-        4
 
 
-<a id="org0bbe80a"></a>
+<a id="orgffa8ec5"></a>
 
 #### tostring(self) -> string
 
@@ -317,19 +310,16 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local interval = Interval.new(6, "min"):tostring()
-    print(interval)
+    m6 = Interval.new(6, "min"):tostring()
     ```
-    
-        m6
 
 
-<a id="org9691062"></a>
+<a id="orgfb528cd"></a>
 
 ### Note
 
 
-<a id="orgd2ec028"></a>
+<a id="orge3ca6a0"></a>
 
 #### fromstring(string) -> Note
 
@@ -337,21 +327,12 @@ After running the command, move the resulting modest.lua file into your project 
 -   Examples:
     
     ```lua
-    local note = Note.fromstring("C#4")
-    print(note)
+    C_sharp_4 = Note.fromstring("C#4")
+    E = Note.fromstring("E") -- the octave is optional
     ```
-    
-        C♯4
-    
-    ```lua
-    local note = Note.fromstring("E") -- the octave is optional
-    print(note)
-    ```
-    
-        E
 
 
-<a id="org5938ee2"></a>
+<a id="org32a3936"></a>
 
 #### new(tone, accidental=0, octave=nil) -> Note
 
@@ -359,21 +340,12 @@ After running the command, move the resulting modest.lua file into your project 
 -   Examples:
     
     ```lua
-    local note = Note.new("D", 1, 5)
-    print(note)
+    D_sharp_5 = Note.new("D", 1, 5)
+    B_double_flat = Note.new("B", -2)
     ```
-    
-        D♯5
-    
-    ```lua
-    local note = Note.new("B", -2)
-    print(note)
-    ```
-    
-        B𝄫
 
 
-<a id="orgf76e184"></a>
+<a id="org3edcda8"></a>
 
 #### transpose(self, interval) -> Note
 
@@ -381,14 +353,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local transposed = Note.fromstring("C4"):transpose("P4")
-    print(transposed)
+    F4 = Note.fromstring("C4"):transpose("P4")
     ```
-    
-        F4
 
 
-<a id="org121c26e"></a>
+<a id="orgebb3cfd"></a>
 
 #### transpose\_down(self, interval) -> Note
 
@@ -396,14 +365,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local transposed_down = Note.fromstring("C4"):transpose_down("m3")
-    print(transposed_down)
+    A3 = Note.fromstring("C4"):transpose_down("m3")
     ```
-    
-        A3
 
 
-<a id="orgb69877d"></a>
+<a id="org5a2b6b9"></a>
 
 #### pitch\_class(self) -> int
 
@@ -411,19 +377,17 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local note = Note.fromstring("G")
-    print(note:pitch_class())
+    pitch_class = Note.fromstring("G"):pitch_class()
+    assert(pitch_class == 7)
     ```
-    
-        7
 
 
-<a id="org7b6883e"></a>
+<a id="orgd606fbd"></a>
 
-#### tostring(self, ascii) -> string
+#### tostring(self) -> string
 
 
-<a id="org7e8d908"></a>
+<a id="orgafb4b34"></a>
 
 #### toascii(self) -> string
 
@@ -431,15 +395,11 @@ After running the command, move the resulting modest.lua file into your project 
 -   Example:
     
     ```lua
-    local note = Note.fromstring("D#4")
-    print(note:tostring())
-    print(note:tostring(true))
-    print(note:toascii())
-    ```
+    note = Note.fromstring("D#4")
     
-        D♯4
-        D#4
-        D#4
+    assert(note:tostring() == "D♯4")
+    assert(note:toascii() == "D#4")
+    ```
 
 
 ## Similar libraries in other languages

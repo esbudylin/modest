@@ -38,7 +38,7 @@ After running the command, move the resulting modest.lua file into your project 
 - Each object provides a 'fromstring' method, allowing object construction through string parsing. While Interval and Note requires strings in a strict format, Chord can parse almost any notation that may be encountered in musical scores or chord charts.
 - Any method that requires one of the library objects as an argument can also accept a string, which will be parsed using the appropriate 'fromstring' method. For example, both of the following expressions are valid.
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local note = Note.fromstring("C5")
+      note = Note.fromstring("C5")
       note:transpose("P5")
       note:transpose(Interval.fromstring("P5"))
     #+end_src
@@ -50,7 +50,7 @@ After running the command, move the resulting modest.lua file into your project 
 - The parsers of the Note and Chord objects can handle both types. When transforming these objects into strings, different methods are available for each representation (see below).
 
 *** Metamethods
-- Each object implements '__tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during string concatenation or when using the 'print' function. It uses Unicode symbols for accidentals.
+- Each object implements '__tostring' metamethod. In Lua, this metamethod is automatically called when an object needs to be represented as a string, such as during calls to 'print' or 'tostring' functions. The implementation uses Unicode symbols for accidentals.
 
 *** Trivia
 - Modest is named after Modest Petrovich Mussorgsky.
@@ -59,44 +59,65 @@ After running the command, move the resulting modest.lua file into your project 
 #+TOC: headlines 4 local
 *** Chord
 **** fromstring(string) -> Chord
-  - Parses a string and returns a Chord object.
+  - Parses a string and returns a Chord object. Supports most of the chord types (see table below). Aims to be as flexible as possible when parsing a chord suffix, allowing various synonymous notations.
+
+| Supported chord type           | Examples             |
+|--------------------------------+----------------------|
+| Basic triads                   | C, Cm                |
+| Augmented chords               | Caug                 |
+| Diminished and half-diminished | Cdim, C⌀7, Cdim7     |
+| Suspended chords               | Csus2, C9sus4        |
+| Seventh chords                 | C7, CM7, CminMaj7    |
+| Extended chords up to the 13th | C9, C13              |
+| Added sixth and 6/9 chords     | C6, Cm(♭6), C6/9     |
+| Added tones                    | Cadd2, Cadd9, C(♯11) |
+| Altered chords                 | C7♯5, C7♯5♭9         |
+| Power chords                   | C5                   |
+| Slash chords                   | C/G                  |
+#+TBLFM: 
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local chord = Chord.fromstring("Cmaj7")
-    print(chord)
+      CM7 = Chord.fromstring("Cmaj7")
     #+end_src
 
     #+RESULTS:
-    : CM7
+
+**** identify(& notes) -> Chord
+  - Identifies a chord based on the given notes. Accepts a variable number of string representations (e.g., "C", "E", "G") or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
+  - Examples:
+    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
+      Cadd9 = Chord.identify("C", "E", "G", "D")
+
+      -- Can also accept note objects
+      Daug = Chord.identify("D", "F#", Note.fromstring("A#"))
+    #+end_src
+
+    #+RESULTS:
 
 **** transpose(self, interval) -> Chord
   - Returns a new Chord transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local transposed = Chord.fromstring("C6/9"):transpose("m3")
-    print(transposed)
+      Eb6_9 = Chord.fromstring("C6/9"):transpose("m3")
     #+end_src
 
     #+RESULTS:
-    : E♭6/9
 
 **** transpose_down(self, interval) -> Chord
   - Similar to transpose, returns a chord transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local transposed_down = Chord.fromstring("Ab9"):transpose_down("P5")
-      print(transposed_down)
+      Db9 = Chord.fromstring("Ab9"):transpose_down("P5")
     #+end_src
 
     #+RESULTS:
-    : D♭9
 
 **** notes(self, octave=nil) -> [Note]
   - Returns the notes that make up the chord. Optionally, specify the octave of the root note.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local notes = Chord.fromstring("F#"):notes(4)
-    for _, note in ipairs(notes) do print(note) end
+      notes = Chord.fromstring("F#"):notes(4)
+      for _, note in ipairs(notes) do print(note) end
     #+end_src
 
     #+RESULTS:
@@ -108,44 +129,40 @@ After running the command, move the resulting modest.lua file into your project 
   - Converts the chord into a numeric representation, with each note represented as the number of semitones from the C of the chord's root octave.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local numeric = Chord.fromstring("C/Bb"):numeric()
-    print(table.concat(numeric, ", "))
+      numeric = Chord.fromstring("C/Bb"):numeric()
+      print(table.concat(numeric, ", "))
     #+end_src
 
     #+RESULTS:
     : -2, 0, 4, 7
 
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local numeric = Chord.fromstring("G9"):numeric()
-    print(table.concat(numeric, ", "))
+      numeric = Chord.fromstring("G9"):numeric()
+      print(table.concat(numeric, ", "))
     #+end_src
 
     #+RESULTS:
     : 7, 11, 14, 17, 21
 
-**** tostring(self, ascii=nil) -> string
-  - Converts the chord into a string. By default accidental will be represented with special Unicode characters. Pass a true value as a parameter to get an ASCII representation.
+**** tostring(self) -> string
+  - Converts the chord into a string. Accidentals will be represented with special Unicode characters.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local chord = Chord.fromstring("C#maj7")
-      print(chord:tostring())
-      print(chord:tostring(true))
+      chord = Chord.fromstring("C#maj7")
+      assert(chord:tostring() == "C♯M7")
     #+end_src
 
     #+RESULTS:
-    : C♯M7
-    : C#M7
 
 **** toascii(self) -> string
-  - Shorthand for chord:tostring(true). Returns the chord as a string with ASCII representations for accidentals.
+  - Returns the chord as a string with ASCII representations for accidentals.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local chord = Chord.fromstring("G7#11")
-      print(chord:toascii())
+      chord = Chord.fromstring("G7#11")
+      assert(chord:toascii() == "G7(#11)")
     #+end_src
 
     #+RESULTS:
-    : G7(#11)
 
 *** Interval
 **** fromstring(string) -> Interval
@@ -157,168 +174,119 @@ After running the command, move the resulting modest.lua file into your project 
     - "M6" = major sixth.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local interval = Interval.fromstring("P4")
-    print(interval)
+      P4 = Interval.fromstring("P4")
     #+end_src
 
     #+RESULTS:
-    : P4
 
 **** new(size, quality="perfect") -> Note
   - Creates a new Interval object. Size should be an integer, and quality should be a string (valid options are "dim", "aug", "min", "maj", "perfect"). The method raises an error if the interval is invalid.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local interval = Interval.new(3, "aug")
-      print(interval)
+      A3 = Interval.new(3, "aug")
+      M13 = Interval.new(13, "maj")
+      P5 = Interval.new(5)
     #+end_src
 
     #+RESULTS:
-    : A3
 
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local interval = Interval.new(13, "maj")
-      print(interval)
-    #+end_src
-
-    #+RESULTS:
-    : M13
-
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local interval = Interval.new(5)
-      print(interval)
-    #+end_src
-
-    #+RESULTS:
-    : P5
-
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local _, err = pcall(function() Interval.new(5, "min") end)
+      _, err = pcall(function() Interval.new(5, "min") end)
       print(err)
     #+end_src
 
     #+RESULTS:
-    : /usr/local/share/lua/5.4/modest/basics.lua:134: Invalid combination of size and quality
+    : ./modest.lua:284: Invalid combination of size and quality
 
 **** identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local interval = Interval.identify("C", "F")
-    print(interval)
+      P4 = Interval.identify("C", "F")
     #+end_src
 
     #+RESULTS:
-    : P4
 
 **** semitones(self) -> int
   - Returns the number of semitones in the interval.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local semitones = Interval.fromstring("M3"):semitones()
-    print(semitones)
+      semitones = Interval.fromstring("M3"):semitones()
+      assert(semitones == 4)
     #+end_src
 
     #+RESULTS:
-    : 4
 
 **** tostring(self) -> string
   - Converts the interval into a string representation.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local interval = Interval.new(6, "min"):tostring()
-    print(interval)
+      m6 = Interval.new(6, "min"):tostring()
     #+end_src
 
     #+RESULTS:
-    : m6
 
 *** Note
 **** fromstring(string) -> Note
   - Parses a string and returns a Note object.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local note = Note.fromstring("C#4")
-      print(note)
+      C_sharp_4 = Note.fromstring("C#4")
+      E = Note.fromstring("E") -- the octave is optional
     #+end_src
 
     #+RESULTS:
-    : C♯4
-
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local note = Note.fromstring("E") -- the octave is optional
-      print(note)
-    #+end_src
-
-    #+RESULTS:
-    : E
 
 **** new(tone, accidental=0, octave=nil) -> Note
   - Creates a new Note object. The tone should be a capital letter (e.g., "C"). The accidental should be a numeric value (e.g., -1 for flat, 1 for sharp). The octave is optional.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local note = Note.new("D", 1, 5)
-    print(note)
+      D_sharp_5 = Note.new("D", 1, 5)
+      B_double_flat = Note.new("B", -2)
     #+end_src
 
     #+RESULTS:
-    : D♯5
-
-    #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local note = Note.new("B", -2)
-    print(note)
-    #+end_src
-
-    #+RESULTS:
-    : B𝄫
 
 **** transpose(self, interval) -> Note
   - Returns a new note transposed by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local transposed = Note.fromstring("C4"):transpose("P4")
-    print(transposed)
+      F4 = Note.fromstring("C4"):transpose("P4")
     #+end_src
 
     #+RESULTS:
-    : F4
 
 **** transpose_down(self, interval) -> Note
   - Returns a new note transposed down by the given interval.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local transposed_down = Note.fromstring("C4"):transpose_down("m3")
-    print(transposed_down)
+      A3 = Note.fromstring("C4"):transpose_down("m3")
     #+end_src
 
     #+RESULTS:
-    : A3
 
 **** pitch_class(self) -> int
   - Returns a number from 0 to 11 representing the pitch class of the note (e.g., C=0, C♯/D♭=1, ..., B=11).
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-    local note = Note.fromstring("G")
-    print(note:pitch_class())
+      pitch_class = Note.fromstring("G"):pitch_class()
+      assert(pitch_class == 7)
     #+end_src
 
     #+RESULTS:
-    : 7
 
-**** tostring(self, ascii) -> string
+**** tostring(self) -> string
 **** toascii(self) -> string
   - Works similarly to the Chord methods of the same name.
   - Example:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
-      local note = Note.fromstring("D#4")
-      print(note:tostring())
-      print(note:tostring(true))
-      print(note:toascii())
+      note = Note.fromstring("D#4")
+
+      assert(note:tostring() == "D♯4")
+      assert(note:toascii() == "D#4")
     #+end_src
 
     #+RESULTS:
-    : D♯4
-    : D#4
-    : D#4
 
 ** Similar libraries in other languages
 - [[https://github.com/bspaans/python-mingus][Mingus]] for Python,
