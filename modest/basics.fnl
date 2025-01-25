@@ -59,7 +59,7 @@
     :double-flat -2
     :double-sharp 2))
 
-(local grammars ((require :modest.grammars)
+(local Grammars ((require :modest.grammars)
                note-fromtable interval-fromtable accidental->semitones))
 
 (fn semitone-interval [a b]
@@ -92,6 +92,9 @@
 (fn find-in-octave [{: tone}]
   (. Octave tone))
 
+(fn dissoc-octave [{: tone : accidental}]
+  (Note.new tone accidental))
+
 (fn assoc-octave [{: tone : accidental} octave]
   (Note.new tone accidental octave))
 
@@ -102,12 +105,20 @@
     :min -1
     (where (or :maj :perfect)) 0))
 
-(fn notate-quality [{: size : quality}]
+(fn quality->string [{: size : quality}]
   (case quality
-    -2 :d
-    -1 (if (is-perfect size) :d :m)
-    0 (if (is-perfect size) :P :M)
-    1 :A))
+    -2 :dim
+    -1 (if (is-perfect size) :dim :min)
+    0 (if (is-perfect size) :perfect :maj)
+    1 :aug)) 
+
+(fn notate-quality [interval]
+  (case (quality->string interval)
+    :dim :d
+    :min :m
+    :maj :M
+    :aug :A
+    :perfect :P))
 
 (fn transpose-util* [{: tone : octave : accidental} {: size &as interval} direction]
   (let [target-semitones (Interval.semitones interval)
@@ -124,7 +135,7 @@
 
 (fn transpose-util [self interval direction]
   (transpose-util* self
-   (parse-if-string grammars.interval interval)
+   (parse-if-string Grammars.interval interval)
    direction))
 
 (fn Note.new [tone acc octave]
@@ -152,13 +163,16 @@
 (fn Note.transpose_down [self interval]
   (transpose-util self interval -1))
 
-(fn Note.tostring [{: tone : accidental : octave} ascii]
+(fn note->string [{: tone : accidental : octave} ascii]
   (.. tone
       (accidental->string accidental ascii)
       (or octave "")))
 
-(fn Note.toascii [note]
-  (Note.tostring note true))
+(fn Note.tostring [self]
+  (note->string self))
+
+(fn Note.toascii [self]
+  (note->string self true))
 
 (λ Interval.new [size ?quality]
   (let [quality
@@ -197,7 +211,7 @@
 (fn Interval.identify [& args]
   (apply identify-interval
          (map
-          (partial parse-if-string grammars.note)
+          (partial parse-if-string Grammars.note)
           args)))
 
 (fn Interval.semitones [{: size : quality}]
@@ -208,10 +222,10 @@
   (.. (notate-quality self) size))
 
 (fn Note.fromstring [str]
-  (parse grammars.note str)) 
+  (parse Grammars.note str)) 
 
 (fn Interval.fromstring [str]
-  (parse grammars.interval str))
+  (parse Grammars.interval str))
 
 (set Note.mt {:__index (dissoc! (copy Note)
                                 :new :fromstring :mt)
@@ -221,5 +235,6 @@
                                     :new :identify :fromstring :mt)
                   :__tostring Interval.tostring})
 
-{: Interval : Note : is-perfect : semitone-interval : accidental->string
- : assoc-octave : transpose-util : grammars}
+{: Interval : Note : Grammars
+ : is-perfect : semitone-interval : accidental->string : quality->string
+ : assoc-octave : dissoc-octave : transpose-util : note->string}

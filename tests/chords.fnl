@@ -2,10 +2,10 @@
 ;; License, v. 2.0. If a copy of the MPL was not distributed with this
 ;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-(local {: assertEquals} (require :luaunit))
+(local {: assertEquals : assertError} (require :luaunit))
 
 (local {: Chord : Interval} (require :modest))
-(local {: map} (require :modest.utils))
+(local {: map : apply} (require :modest.utils))
 
 (import-macros {: parameterized} :test-macros)
 
@@ -192,7 +192,8 @@
             [:F5]
             ["F(#11)"]
             [:Cadd9]
-            [:C9add13]]
+            [:C9add13]
+            [:C9sus4]]
  (fn [chord to_string]
    (let [parsed-chord (Chord.fromstring chord)]
      (assertEquals (parsed-chord:toascii)
@@ -223,3 +224,43 @@
                  chord
                  (.. "Mismatched transpose_down result for chord: "
                      chord))))
+
+(parameterized
+ :identify
+ [[:C [:C :E :G]]
+  [:Am [:A :C :E]]
+  [:Fm7 [:F :Ab :C :Eb]]
+  [:D7 [:D :F# :A :C]]
+  [:Emaj7 [:E :G# :B :D#]]
+  [:C6 [:C :E :G :A]]
+  [:Cm6 [:C :Eb :G :A]]
+  [:F5 [:F :C]]
+  [:Adim [:A :C :Eb]]
+  [:Adim7 [:A :C :Eb :Gb]]
+  ["C⌀" [:C :Eb :Gb :Bb]]
+  [:Amadd4 [:A :C :D :E]]
+  [:C9 [:C :E :G :Bb :D]]
+  [:Cadd2 [:C :D :E :G]]
+  [:Cadd9 [:C :E :G :D]]
+  [:C13 [:C :E :G :Bb :D :F :A]]
+  [:C6/9 [:C :E :G :A :D]]
+  [:C7b9 [:C :E :G "B♭" "D♭"]]
+  ["C7♯9" [:C :E :G "B♭" "D♯"]]
+  ["C7♯11" [:C :E :G "B♭" "F♯"]]
+  ["C13♯11" [:C :E :G "B♭" :D "F♯" :A]]
+  ["Cm9(#11)" [:C :Eb :G :Bb :D :F#]]
+  ["Cm(b6)" [:C :Eb :G :Ab]]
+  [:C13b5#9 [:C :E "G♭" "B♭" "D♯" :F :A]]
+  [:Caug [:C :E :G#]]]
+ (fn [chord notes]
+   (assertEquals (apply Chord.identify notes)
+                 (Chord.fromstring chord))))
+
+(parameterized
+ :invalid_chords
+ [[:Eb :F :G]
+  [:C :D :Eb]
+  [:C :E :E# :G]
+  [:C :Db :D :E :G]]
+ (fn [& notes]
+   (assertError #(apply Chord.identify notes))))
