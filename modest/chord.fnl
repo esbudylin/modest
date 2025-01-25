@@ -80,20 +80,26 @@
 (fn is-half-dim [{: triad : seventh}]
   (and (= triad :dim) (= seventh :min)))
 
-(fn quality->string [{: triad &as chord}]
-  (if (is-half-dim chord)
-      ;; half-diminished chord is handled as a m7(b5) chord due to the lack of an ascii symbol for it
-      :m
-      (case triad
-        :power :5
-        [:sus step] (.. :sus step)
-        :min :m
-        :maj ""
-        _ triad)))
+(fn quality->string* [{: triad : seventh}]
+  (case triad
+    :power :5
+    [:sus step] (values (.. :sus step) true)
+    :min :m
+    :maj ""
+    ;; half-diminished chord is handled as a m7(b5) chord due to the lack of an ascii symbol for it
+    (where :dim (= seventh :min)) :m
+    _ triad))
 
 (fn ext->string [{: seventh : ext}]
   (when ext
     (.. (if (= seventh :maj) "M" "") ext)))
+
+(fn quality->string [chord]
+  (let [(quality is-sus) (quality->string* chord)
+        ext (or (ext->string chord) "")]
+    (if is-sus
+        (.. ext quality)
+        (.. quality ext))))
 
 (fn alterations->string [{: alterations &as chord} ascii]
   (let [alterations (-> (or alterations [])
@@ -113,8 +119,9 @@
 
 ;; transforms a parsed chord suffix (e.g. mM7, aug, dim7) into a string
 (fn suffix->string [suffix ascii]
-  (let [foos [quality->string ext->string
-              add->string #(alterations->string $ ascii)]
+  (let [foos [quality->string
+              add->string
+              #(alterations->string $ ascii)]
         strings (map #($ suffix) foos)]
     (reduce #(.. $ (or $2 "")) "" strings)))
 

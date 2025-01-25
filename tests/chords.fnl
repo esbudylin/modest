@@ -192,7 +192,8 @@
             [:F5]
             ["F(#11)"]
             [:Cadd9]
-            [:C9add13]]
+            [:C9add13]
+            [:C9sus4]]
  (fn [chord to_string]
    (let [parsed-chord (Chord.fromstring chord)]
      (assertEquals (parsed-chord:toascii)
