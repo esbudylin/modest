@@ -6,7 +6,7 @@
 Musical harmony library for Lua.
 
 ** Features
-- [[Chord][Chord Object]]. Supports a wide range of chords, from simple major/minor to complex jazz chords. Can transpose chords and retrieve individual notes. Provides a flexible string parsing.
+- [[Chord][Chord Object]]. Supports a wide range of chords, from simple major/minor to complex jazz chords. Provides a flexible string parsing, can identify a chord based on its notes. Can transpose chords and retrieve individual notes. 
 - [[Note][Note Object]]. Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
 - [[Interval][Interval Object]]. Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
 
