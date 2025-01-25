@@ -83,7 +83,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+RESULTS:
 
 **** identify(& notes) -> Chord
-  - Identifies a chord based on the given notes. Accepts a variable number of string representations (e.g., "C", "E", "G") or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
+  - Identifies a chord based on the given notes. Accepts a variable number of string representations or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
   - Examples:
     #+begin_src lua :prologue "l = require 'modest' Chord, Interval, Note = l.Chord, l.Interval, l.Note" :results output :exports both
       Cadd9 = Chord.identify("C", "E", "G", "D")

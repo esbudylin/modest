@@ -5,9 +5,9 @@ Musical harmony library for Lua.
 
 ## Features
 
--   [Chord Object](#orge083022). Supports a wide range of chords, from simple major/minor to complex jazz chords. Provides a flexible string parsing, can identify a chord based on its notes. Can transpose chords and retrieve individual notes.
--   [Note Object](#orgc496bdf). Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
--   [Interval Object](#org3ad98c3). Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
+-   [Chord Object](#org03ebc4e). Supports a wide range of chords, from simple major/minor to complex jazz chords. Provides a flexible string parsing, can identify a chord based on its notes. Can transpose chords and retrieve individual notes.
+-   [Note Object](#orgc2fce48). Handles alterations (sharps, flats, double accidentals), octaves, pitch classes.
+-   [Interval Object](#org521fde5). Supports simple and compound intervals. Can identify the interval between two notes and represent it in semitones.
 
 
 ## Installation
@@ -73,37 +73,37 @@ After running the command, move the resulting modest.lua file into your project 
 
 ## Documentation
 
-1.  [Chord](#orge083022)
-    1.  [fromstring(string) -> Chord](#org3e1e1cd)
-    2.  [identify(& notes) -> Chord](#orgf5219df)
-    3.  [transpose(self, interval) -> Chord](#org306bfb8)
-    4.  [transpose\_down(self, interval) -> Chord](#org881e81e)
-    5.  [notes(self, octave=nil) -> [Note]](#org11ad2b2)
-    6.  [numeric(self) -> [int]](#org8756318)
-    7.  [tostring(self) -> string](#orgb363cd5)
-    8.  [toascii(self) -> string](#org148bfd4)
-2.  [Interval](#org3ad98c3)
-    1.  [fromstring(string) -> Interval](#org0584552)
-    2.  [new(size, quality="perfect") -> Note](#org69d502e)
-    3.  [identify(note1, note2) -> Interval](#org2782435)
-    4.  [semitones(self) -> int](#org95c7f9b)
-    5.  [tostring(self) -> string](#org5daed0b)
-3.  [Note](#orgc496bdf)
-    1.  [fromstring(string) -> Note](#org61a9313)
-    2.  [new(tone, accidental=0, octave=nil) -> Note](#orga039f43)
-    3.  [transpose(self, interval) -> Note](#orgfe70cca)
-    4.  [transpose\_down(self, interval) -> Note](#org6e87c5f)
-    5.  [pitch\_class(self) -> int](#org33f3b89)
-    6.  [tostring(self) -> string](#orgf02a9a1)
-    7.  [toascii(self) -> string](#org6a1e579)
+1.  [Chord](#org03ebc4e)
+    1.  [fromstring(string) -> Chord](#orge86f9f8)
+    2.  [identify(& notes) -> Chord](#orgcf355b9)
+    3.  [transpose(self, interval) -> Chord](#orga761c35)
+    4.  [transpose\_down(self, interval) -> Chord](#org15d1eef)
+    5.  [notes(self, octave=nil) -> [Note]](#org093eb7b)
+    6.  [numeric(self) -> [int]](#org3a1818e)
+    7.  [tostring(self) -> string](#orgc2cbe4c)
+    8.  [toascii(self) -> string](#org04887a6)
+2.  [Interval](#org521fde5)
+    1.  [fromstring(string) -> Interval](#orgab761da)
+    2.  [new(size, quality="perfect") -> Note](#orgdb756d8)
+    3.  [identify(note1, note2) -> Interval](#org527f5ee)
+    4.  [semitones(self) -> int](#org3560c86)
+    5.  [tostring(self) -> string](#org69ff09b)
+3.  [Note](#orgc2fce48)
+    1.  [fromstring(string) -> Note](#orgc081184)
+    2.  [new(tone, accidental=0, octave=nil) -> Note](#orgd37eb82)
+    3.  [transpose(self, interval) -> Note](#org597bc67)
+    4.  [transpose\_down(self, interval) -> Note](#org45fff1f)
+    5.  [pitch\_class(self) -> int](#org2afcd4e)
+    6.  [tostring(self) -> string](#org100fdf9)
+    7.  [toascii(self) -> string](#org2eeb2a4)
 
 
-<a id="orge083022"></a>
+<a id="org03ebc4e"></a>
 
 ### Chord
 
 
-<a id="org3e1e1cd"></a>
+<a id="orge86f9f8"></a>
 
 #### fromstring(string) -> Chord
 
@@ -130,11 +130,11 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgf5219df"></a>
+<a id="orgcf355b9"></a>
 
 #### identify(& notes) -> Chord
 
--   Identifies a chord based on the given notes. Accepts a variable number of string representations (e.g., "C", "E", "G") or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
+-   Identifies a chord based on the given notes. Accepts a variable number of string representations or Note objects. Assumes the first argument for a chord root. If the octaves of the given notes are not specified, assumes they go in ascending order. Supports the same types of chords as the 'fromstring' method, except for slash chords. Does not support inversions. Raises an error if the notes do not form a recognizable chord.
 -   Examples:
     
     ```lua
@@ -145,7 +145,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org306bfb8"></a>
+<a id="orga761c35"></a>
 
 #### transpose(self, interval) -> Chord
 
@@ -157,7 +157,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org881e81e"></a>
+<a id="org15d1eef"></a>
 
 #### transpose\_down(self, interval) -> Chord
 
@@ -169,7 +169,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org11ad2b2"></a>
+<a id="org093eb7b"></a>
 
 #### notes(self, octave=nil) -> [Note]
 
@@ -182,7 +182,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org8756318"></a>
+<a id="org3a1818e"></a>
 
 #### numeric(self) -> [int]
 
@@ -200,7 +200,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgb363cd5"></a>
+<a id="orgc2cbe4c"></a>
 
 #### tostring(self) -> string
 
@@ -213,7 +213,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org148bfd4"></a>
+<a id="org04887a6"></a>
 
 #### toascii(self) -> string
 
@@ -226,12 +226,12 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org3ad98c3"></a>
+<a id="org521fde5"></a>
 
 ### Interval
 
 
-<a id="org0584552"></a>
+<a id="orgab761da"></a>
 
 #### fromstring(string) -> Interval
 
@@ -248,7 +248,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org69d502e"></a>
+<a id="orgdb756d8"></a>
 
 #### new(size, quality="perfect") -> Note
 
@@ -267,7 +267,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org2782435"></a>
+<a id="org527f5ee"></a>
 
 #### identify(note1, note2) -> Interval
 
@@ -279,7 +279,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org95c7f9b"></a>
+<a id="org3560c86"></a>
 
 #### semitones(self) -> int
 
@@ -292,7 +292,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org5daed0b"></a>
+<a id="org69ff09b"></a>
 
 #### tostring(self) -> string
 
@@ -304,12 +304,12 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgc496bdf"></a>
+<a id="orgc2fce48"></a>
 
 ### Note
 
 
-<a id="org61a9313"></a>
+<a id="orgc081184"></a>
 
 #### fromstring(string) -> Note
 
@@ -322,7 +322,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orga039f43"></a>
+<a id="orgd37eb82"></a>
 
 #### new(tone, accidental=0, octave=nil) -> Note
 
@@ -335,7 +335,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgfe70cca"></a>
+<a id="org597bc67"></a>
 
 #### transpose(self, interval) -> Note
 
@@ -347,7 +347,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org6e87c5f"></a>
+<a id="org45fff1f"></a>
 
 #### transpose\_down(self, interval) -> Note
 
@@ -359,7 +359,7 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="org33f3b89"></a>
+<a id="org2afcd4e"></a>
 
 #### pitch\_class(self) -> int
 
@@ -372,12 +372,12 @@ After running the command, move the resulting modest.lua file into your project 
     ```
 
 
-<a id="orgf02a9a1"></a>
+<a id="org100fdf9"></a>
 
 #### tostring(self) -> string
 
 
-<a id="org6a1e579"></a>
+<a id="org2eeb2a4"></a>
 
 #### toascii(self) -> string
 
