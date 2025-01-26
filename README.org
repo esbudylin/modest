@@ -196,7 +196,7 @@ After running the command, move the resulting modest.lua file into your project 
     #+end_src
 
     #+RESULTS:
-    : ./modest.lua:284: Invalid combination of size and quality
+    : ./modest.lua:287: Invalid combination of size and quality
 
 **** identify(note1, note2) -> Interval
   - Identifies the interval between two notes.
