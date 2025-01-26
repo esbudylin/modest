@@ -1,7 +1,8 @@
 package = "modest-harmony"
-version = "scm-1"
+version = "0.3-1"
 source = {
    url = "git://github.com/esbudylin/modest.git",
+   tag = "0.3-1"
 }
 description = {
    homepage = "https://github.com/esbudylin/modest",
@@ -11,8 +12,8 @@ description = {
 }
 dependencies = {
    "lua >= 5.1, < 5.5",
-   "lpeg ~> 1.1",
    "fennel ~> 1.5",
+   "lpeg ~> 1.1",
    "luarocks-build-fennel ~> 0.1",
 }
 build = {
@@ -22,7 +23,7 @@ build = {
       ["modest.utils"] = "modest/utils.fnl",
       ["modest.basics"] = "modest/basics.fnl",
       ["modest.chord"] = "modest/chord.fnl",
-      ["modest.grammars"] = "modest/grammars.fnl"
+      ["modest.grammars"] = "modest/grammars.lua"
       ["modest.identify"] = "modest/identify.lua"
    },
 }
