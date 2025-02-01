@@ -31,6 +31,16 @@ After running the command, move the resulting modest.lua file into your project 
 *** Lua version support
 - The library supports both Lua 5.4 and LuaJIT. It should also be compatible with older Lua 5.x versions.
 
+*** Importing the library
+- The library does note register any global values. Every example below assumes you have properly required it like this:  
+    #+begin_src lua
+      local modest = require 'modest'
+
+      local Chord, Interval, Note = modest.Chord, modest.Interval, modest.Note
+    #+end_src
+
+#+RESULTS:
+
 *** Immutability
 - Methods in the library do not mutate objects; instead, they return new instances. However, as these instances are regular Lua tables, they can still be modified after creation. It is strongly advised *not* to mutate them, as this could lead to unexpected behavior.
 
