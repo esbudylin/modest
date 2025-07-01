@@ -123,7 +123,7 @@
               add->string
               #(alterations->string $ ascii)]
         strings (map #($ suffix) foos)]
-    (reduce #(.. $ (or $2 "")) "" strings)))
+    (table.concat strings)))
 
 (fn chord->string [{: root : bass : suffix} ascii]
   (let [str-func #(note->string $ ascii)]

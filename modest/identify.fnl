@@ -38,7 +38,7 @@
   (let [cases (icollect [i e (ipairs rest)]
                 (if (= (% i 2) 1)
                     `(includes-sequence
-                      (. ,interval-obj ,intervals-field)
+                      (map tostring (. ,interval-obj ,intervals-field))
                       ,e
                       (. ,interval-obj :identified-intervals))
                     e))]
@@ -55,7 +55,7 @@
 
 (fn identify-altered-triad [{: alteration-map &as interval-obj}]
   (let [triad
-        (interval-cond interval-obj :intervals-strings
+        (interval-cond interval-obj :intervals
                        [:m3 :d5] :dim
                        [:M3 :A5] :aug)]
     (when triad
@@ -63,7 +63,7 @@
       triad)))
 
 (fn identify-triad* [interval-obj]
-  (interval-cond interval-obj :normalized-intervals-strings
+  (interval-cond interval-obj :normalized-intervals
                  [:m3 :P5] :min
                  [:M3 :P5] :maj
                  [:M2 :P5] [:sus 2]
@@ -77,7 +77,7 @@
    (not-identified)))
 
 (fn identify-ext* [interval-obj]
-  (interval-cond interval-obj :normalized-intervals-strings
+  (interval-cond interval-obj :normalized-intervals
                  [:m7 :M9 :P11 :M13] 13
                  [:m7 :M9 :P11] 11
                  [:m7 :M9] 9
@@ -132,8 +132,6 @@
         interval-obj {: normalized-intervals
                       : intervals
                       : alteration-map
-                      :normalized-intervals-strings (map tostring normalized-intervals)
-                      :intervals-strings (map tostring intervals)
                       :identified-intervals []}
         triad (identify-triad interval-obj)
         ext (identify-ext interval-obj)
