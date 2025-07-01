@@ -20,6 +20,8 @@ jobs:
         luaVersion: "5.4"
 
     - uses: leafo/gh-actions-luarocks@v4
+      with:
+        luarocksVersion: "3.12.2"
 
     - name: build
       run: |
@@ -39,8 +41,10 @@ jobs:
     - uses: leafo/gh-actions-lua@v10
       with:
         luaVersion: "luajit-openresty"
-
+        
     - uses: leafo/gh-actions-luarocks@v4
+      with:
+        luarocksVersion: "3.12.2"
 
     - name: build
       run: |
