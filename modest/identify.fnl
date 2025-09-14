@@ -111,10 +111,10 @@
     res))
 
 (fn handle-alterations [intervals]
-  (let [alteration-interevals (table-set 4 5 6 9 11 13)
+  (let [alteration-intervals (table-set 4 5 6 9 11 13)
         alterations {}
         intervals (icollect [_ interval (ipairs intervals)]
-                    (if (and (. alteration-interevals interval.size)
+                    (if (and (. alteration-intervals interval.size)
                              (not= interval.quality 0))
                         (do
                           (set (. alterations interval.size) interval.quality)
