@@ -112,15 +112,15 @@
 
 (fn handle-alterations [intervals]
   (let [alteration-intervals (table-set 4 5 6 9 11 13)
-        alterations {}
-        intervals (icollect [_ interval (ipairs intervals)]
+        alteration-map {}
+        normalized-intervals (icollect [_ interval (ipairs intervals)]
                     (if (and (. alteration-intervals interval.size)
                              (not= interval.quality 0))
                         (do
-                          (set (. alterations interval.size) interval.quality)
+                          (set (. alteration-map interval.size) interval.quality)
                           (Interval.new interval.size 0))
                         interval))]
-    (values intervals alterations)))
+    (values normalized-intervals alteration-map)))
 
 (fn alterations->seq [alteration-map]
   (when (next alteration-map)
